@@ -1,14 +1,13 @@
 "use client";
 import React, { useRef, useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import "mapbox-gl/dist/mapbox-gl.css";
 import * as turf from "@turf/turf";
 import ContentBar from "./ContentBar";
 import MapSourceControl from "./MapSourceControl";
 import { FaMap } from "react-icons/fa";
-const apiKey = process.env.MAPBOX_API_KEY;
-
+const apiKey = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
 mapboxgl.accessToken = apiKey;
 
@@ -146,7 +145,8 @@ const MapComponenet = ({
       div.style.cursor = "pointer";
       div.addEventListener("contextmenu", (e) => e.preventDefault());
       div.addEventListener("click", () => setShowOptions(!showOptions));
-      ReactDOM.render(<FaMap className="w-[29px] h-[29px] p-[7px]" />, div);
+      const root = ReactDOM.createRoot(div);
+      root.render(<FaMap className="w-[29px] h-[29px] p-[7px]" />);
       return div;
     }
     onRemove() {
