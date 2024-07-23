@@ -14,7 +14,7 @@ if (apiKey) {
 } else {
   console.log("no key");
 }
-mapboxgl.accessToken = 'pk.eyJ1IjoidGVqYXNhcm9yYTUiLCJhIjoiY2x5eWx6bDA3MXZtcTJscXJxMDhyemVoMSJ9.XBHWljATkATcbq_xObfZ3Q';
+mapboxgl.accessToken = apiKey;
 
 let layersAdded = new Set();
 let pointsAdded = new Set();
@@ -86,7 +86,7 @@ const MapComponenet = ({
     el.style.width = "15px";
     el.style.height = "15px";
     el.style.borderRadius = "50%";
-    el.style.backgroundColor = "red";
+    el.style.backgroundColor = "#FF8C00";
     el.style.zIndex = "10"; // Set a high z-index
     el.addEventListener("click", (e) => {
       e.stopPropagation(); // Prevent the click from reaching the map
@@ -120,8 +120,8 @@ const MapComponenet = ({
         "line-cap": "round",
       },
       paint: {
-        "line-color": "#444",
-        "line-width": 5,
+        "line-color": "#FFD700",
+        "line-width": 6,
         "line-opacity": 1,
       },
     });
@@ -319,8 +319,8 @@ const MapComponenet = ({
             "line-cap": "round",
           },
           paint: {
-            "line-color": "#444",
-            "line-width": 5,
+            "line-color": "#FFD700",
+            "line-width": 6,
             "line-opacity": 1,
           },
         });
@@ -374,6 +374,29 @@ const MapComponenet = ({
     console.log("Setting base map " + baseMap)
     let mapTile = baseMaps[baseMap];
     map.current.setStyle(mapTile);
+
+    map.current.on("style.load", () => {
+      for (let val of layersAdded) {
+        map.current.removeLayer(val);
+        map.current.addLayer({
+          id: val,
+          type: "line",
+          source: val,
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#FFD700",
+            "line-width": 6,
+            "line-opacity": 1,
+          },
+        });
+      }
+
+    })
+
+
   }, [baseMap])
   function processSelectedTheme(id) {
     console.log(themeStoryList);

@@ -144,8 +144,8 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
   if (!isOpen) return null;
 
   return (
-    <div className="h-[82%] w-[450px] ml-5 bg-white shadow-lg z-[2] absolute top-[130px] left-0 rounded-xl overflow-hidden flex flex-col">
-      <div className="p-4 bg-gray-100">
+    <div className="h-[82%] w-[450px] ml-5 bg-white shadow-md z-[2] absolute top-[130px] left-0 rounded-xl overflow-hidden flex flex-col">
+      <div className="p-4 bg-gray-50">
         <div className="flex justify-between items-start">
           <div className="flex justify-center items-center w-[400px]" >
             <h2 
@@ -188,7 +188,7 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
         </div>
       </div>
 
-      <div className="p-4 bg-gray-100 flex justify-between items-center">
+      <div className="p-4 bg-gray-50 flex justify-between items-center">
         <button 
           onClick={handlePrevious} 
           className={`text-gray-500 hover:text-gray-700 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -201,7 +201,7 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
           {[...Array(totalPages)].map((_, i) => (
             <div
               key={i}
-              className={`w-2 h-2 rounded-full ${i + 1 === currentPage ? 'bg-blue-500' : 'bg-gray-300'}`}
+              className={`w-2 h-2 rounded-full ${i + 1 === currentPage ? 'bg-blue-600' : 'bg-blue-400'}`}
             />
           ))}
         </div>

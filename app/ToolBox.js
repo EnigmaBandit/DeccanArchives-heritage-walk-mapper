@@ -37,7 +37,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
 
   return (
     <div className="toolboxOuter flex-col">
-      <nav className=" flex justify-between items-center p-4 bg-gray-200 shadow-md  z-10 rounded-lg mx-4 mt-4">
+      <nav className=" flex justify-between items-center p-4 bg-white shadow-md  z-10 rounded-lg mx-4 mt-4">
         <div className="flex items-center space-x-4">
           <Link href="/" className="text-gray-800 text-2xl font-semibold">
             Stories of Hyderabad
@@ -61,7 +61,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
       </nav>
       <div>
         <div className="flex items-center mt-2">
-            <form className="  w-[450px] ml-5  bg-gray-200 rounded-full">
+            <form className="  w-[450px] ml-5  bg-white shadow-md rounded-full">
                   <input type="search" placeholder="Type Here" className=" bg-transparent rounded-full pl-5 h-8 w-[95%] "
                     value={searchTerm}
                     onChange={handleSearch} />
@@ -70,7 +70,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
                 {Object.entries(themes).map(([key, value]) => (
                   <button 
                     key={key} 
-                    className="bg-gray-200 h-7 text-gray-500 hover:bg-gray-200 pl-[15px] pr-[15px] ml-[10px] rounded-full"
+                    className="bg-white h-7 text-gray-500 shadow-md hover:bg-gray-200 pl-[15px] pr-[15px] ml-[10px] rounded-full"
                     onClick={() => selectTheme(key)} 
                   >
                     {value['name']}
@@ -81,7 +81,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
         
         {
             searchTerm.length > 0 && (
-                <div className=" bg-gray-200 rounded-xl w-[450px] ml-5 mt-1 flex flex-col z-[3]  ">
+                <div className=" bg-white rounded-xl w-[450px] ml-5 mt-1 flex flex-col z-[3]  ">
                         {
                         filteredWords.map((singleDict, index) => (
                           <span 

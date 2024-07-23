@@ -1,5 +1,6 @@
 async function fetchWords() {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbxmY_-m_8PP4OhuAZnPfHzitXkpTym8yD4u3RDbZ_a94YWOAdvaunTfiiOehjypdkGs/exec');
+    const ms = Date.now();
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxmY_-m_8PP4OhuAZnPfHzitXkpTym8yD4u3RDbZ_a94YWOAdvaunTfiiOehjypdkGs/exec' +"?dummy="+ms);
     const jsonObject = await response.json();
     return jsonObject;
   }

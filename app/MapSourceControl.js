@@ -24,7 +24,7 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
   };
 
   return (
-    <div className="absolute z-10 bottom-24 right-10 bg-gray-800 text-white p-6 rounded-lg shadow-lg w-72 backdrop-filter backdrop-blur-lg bg-opacity-90">
+    <div className="absolute z-10 bottom-24 right-12 bg-white p-6 rounded-lg shadow-md w-72 backdrop-filter backdrop-blur-lg bg-opacity-90">
       <h2 className="text-xl font-bold mb-4 border-b border-gray-600 pb-2">Map Controls</h2>
       
       <div className="mb-6">
@@ -32,7 +32,7 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
           <FaMapMarkerAlt className="mr-2" /> Base Map
         </h3>
         <select
-          className="w-full p-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-2 bg-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           onChange={(e) => setBaseMap(e.target.value)}
           value={baseMap}>
           <option>Street</option>
@@ -45,7 +45,7 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
           <FaLayerGroup className="mr-2" /> Historical Map Overlay
         </h3>
         <select
-          className="w-full p-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-2 bg-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={selectedMap}
           onChange={handleMapChange}
           maxLength={50}
