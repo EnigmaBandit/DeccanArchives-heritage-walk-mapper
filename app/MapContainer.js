@@ -14,7 +14,7 @@ if (apiKey) {
 } else {
   console.log("no key");
 }
-mapboxgl.accessToken = 'pk.eyJ1IjoidGVqYXNhcm9yYTUiLCJhIjoiY2x4ZGI5c255MDN3YTJqc2pjZnRtdjhvbiJ9.L9E7JBaaZwJInrqYrG2pXw';
+mapboxgl.accessToken = 'pk.eyJ1IjoidGVqYXNhcm9yYTUiLCJhIjoiY2x5eWx6bDA3MXZtcTJscXJxMDhyemVoMSJ9.XBHWljATkATcbq_xObfZ3Q';
 
 let layersAdded = new Set();
 let pointsAdded = new Set();
@@ -44,7 +44,8 @@ const MapComponenet = ({
   const [zoom, setZoom] = useState(10);
   const [showOptions, setShowOptions] = useState(false);
   const [baseMap, setBaseMap] = useState("Street");
-  const [overlaidMap, setOverlaidMap] = useState("");
+  const [overlaidMap, setOverlaidMap] = useState('');
+  const [isoverloadDisplayed, setIsoverloadDisplayed] = useState(false);
 
   const popup = useRef(
     new mapboxgl.Popup({ closeButton: true, closeOnClick: false })
@@ -111,6 +112,7 @@ const MapComponenet = ({
 
     map.current.addLayer({
       id: id,
+      slot: 'top',
       type: "line",
       source: id,
       layout: {
@@ -234,6 +236,8 @@ const MapComponenet = ({
       zoom: zoom,
     });
 
+
+
     const mapSourceButton = new MapSourceButton(showOptions, setShowOptions);
 
     map.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
@@ -263,7 +267,8 @@ const MapComponenet = ({
         ["==", ["get", "maritime"], "false"],
         ["match", ["get", "worldview"], ["all", "IN"], true, false],
       ]);
-    });
+  }
+  );
   });
 
   useEffect(() => {
@@ -276,6 +281,51 @@ const MapComponenet = ({
       processSelectedStory(id);
     }
   }, [selectedFeature]);
+
+
+  useEffect(() => {
+    if (isoverloadDisplayed == true) {
+    map.current.removeLayer('overlaidMap');
+    map.current.removeSource('overlaidMap');
+    }
+    if(overlaidMap ==='') {
+      setIsoverloadDisplayed(false);
+      return;
+    }
+    let tileSetUrl = "mapbox://" + overlaidMap;
+      setIsoverloadDisplayed(true);
+      map.current.addSource('overlaidMap', {
+        type: 'raster',
+        url: tileSetUrl
+      });
+
+      map.current.addLayer({
+        id: 'overlaidMap',
+        slot: 'top',
+        beforeId :'referenceMap',
+        source: 'overlaidMap',
+        type: 'raster'
+      });
+
+      for (let val of layersAdded) {
+        map.current.removeLayer(val);
+        map.current.addLayer({
+          id: val,
+          slot: 'top',
+          type: "line",
+          source: val,
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#444",
+            "line-width": 5,
+            "line-opacity": 1,
+          },
+        });
+      }
+  },[overlaidMap])
 
   useEffect(() => {
     let featureType = focusedFeature[0];

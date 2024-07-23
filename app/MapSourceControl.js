@@ -2,26 +2,26 @@ import React, { useState } from 'react';
 import { FaSearch, FaMapMarkerAlt, FaLayerGroup, FaAdjust } from 'react-icons/fa';
 
 const historicalMaps = [
-   [ "None",  "none"],
-   [ "Durgam Cheruvu", "two"]
+  ["None", ''],
+  ["Durgam Cheruvu", "tejasarora5.c65pooux"]
 ];
 
-
 const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, setOverlaidMap }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMap, setSelectedMap] = useState('');
 
-  console.log("selecting + " );
+  console.log("selecting + ");
   console.log()
+
   if (!showOptions) return null;
 
-  const filteredMaps = historicalMaps.filter(map => 
-    map[0].toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  function changeBaseMap (selectedOption)   {
-    console.log("Changing base map for : ");
-    console.log
-  }
+  const handleMapChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedMap(selectedValue);
+    const selectedMapData = historicalMaps.find(map => map[0] === selectedValue);
+    if (selectedMapData) {
+      setOverlaidMap(selectedMapData[1]);
+    }
+  };
 
   return (
     <div className="absolute z-10 bottom-24 right-10 bg-gray-800 text-white p-6 rounded-lg shadow-lg w-72 backdrop-filter backdrop-blur-lg bg-opacity-90">
@@ -31,11 +31,12 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
         <h3 className="font-semibold mb-2 flex items-center">
           <FaMapMarkerAlt className="mr-2" /> Base Map
         </h3>
-        <select className="w-full p-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
-           onChange = {(e) => setBaseMap(e.target.value)}
-           value = {baseMap}>
-            <option>Street</option>
-            <option>Satellite</option>
+        <select
+          className="w-full p-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          onChange={(e) => setBaseMap(e.target.value)}
+          value={baseMap}>
+          <option>Street</option>
+          <option>Satellite</option>
         </select>
       </div>
       
@@ -43,33 +44,28 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
         <h3 className="font-semibold mb-2 flex items-center">
           <FaLayerGroup className="mr-2" /> Historical Map Overlay
         </h3>
-        <div className="relative">
-          <input 
-            type="text"
-            placeholder="Search historical maps..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 pr-8 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <FaSearch className="absolute right-3 top-3 text-gray-400" />
-        </div>
-        {searchTerm && (
-          <ul className="mt-2 bg-gray-700 rounded max-h-32 overflow-y-auto">
-            {filteredMaps.map((map, index) => (
-              <li key={index} className="p-2 hover:bg-gray-600 cursor-pointer">{map}</li>
-            ))}
-          </ul>
-        )}
+        <select
+          className="w-full p-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={selectedMap}
+          onChange={handleMapChange}
+          maxLength={50}
+        >
+          {historicalMaps.map((map, index) => (
+            <option key={index} value={map[0]}>
+              {map[0]}
+            </option>
+          ))}
+        </select>
       </div>
       
       <div>
         <h3 className="font-semibold mb-2 flex items-center">
           <FaAdjust className="mr-2" /> Overlay Opacity
         </h3>
-        <input 
-          type="range" 
-          min="0" 
-          max="100" 
+        <input
+          type="range"
+          min="0"
+          max="100"
           className="w-full accent-blue-500"
         />
       </div>
