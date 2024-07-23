@@ -9,7 +9,12 @@ import MapSourceControl from "./MapSourceControl";
 import { FaMap } from "react-icons/fa";
 const apiKey = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
-mapboxgl.accessToken = apiKey;
+if (apiKey) {
+   console.log ("key is present : " + apiKey);
+} else {
+  console.log("no key");
+}
+mapboxgl.accessToken = 'pk.eyJ1IjoidGVqYXNhcm9yYTUiLCJhIjoiY2x4ZGI5c255MDN3YTJqc2pjZnRtdjhvbiJ9.L9E7JBaaZwJInrqYrG2pXw';
 
 let layersAdded = new Set();
 let pointsAdded = new Set();
