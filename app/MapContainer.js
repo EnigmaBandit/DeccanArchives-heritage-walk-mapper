@@ -16,7 +16,7 @@ if (apiKey) {
 }
 mapboxgl.accessToken = apiKey;
 
-let layersAdded = new Set();
+let layersAdded = new Map();
 let pointsAdded = new Set();
 let mapMarkers = [];
 
@@ -96,20 +96,15 @@ const MapComponenet = ({
     return el;
   }
 
-  function displayStory(id) {
-    if (layersAdded.has(id)) {
-      return;
-    }
-    layersAdded.add(id);
-    var story = stories[id];
-    var coordString = story["coord"];
-    var storyObj = JSON.parse(coordString);
-
+  function addStoryObj (id, storyObj) {
     map.current.addSource(id, {
       type: "geojson",
       data: storyObj,
     });
+    addLayerFromSourceId(id);
+  }
 
+  function addLayerFromSourceId(id) {
     map.current.addLayer({
       id: id,
       slot: 'top',
@@ -125,9 +120,18 @@ const MapComponenet = ({
         "line-opacity": 1,
       },
     });
+  }
 
-    // Add click event handler
-    console.log("Seected walk " + selectedFeature[0]);
+  function displayStory(id) {
+    if (layersAdded.has(id)) {
+      return;
+    }
+    var story = stories[id];
+    var coordString = story["coord"];
+    var storyObj = JSON.parse(coordString);
+    layersAdded.set(id, storyObj);
+    addStoryObj(id, storyObj);
+
 
     // Change the cursor to a pointer when hovering over the polyline layer
     map.current.on("mouseenter", id, () => {
@@ -163,7 +167,7 @@ const MapComponenet = ({
 
   function handleMapClick(e) {
     setShowOptions(false);
-    const features = Array.from(layersAdded).flatMap((id) =>
+    const features = Array.from(layersAdded.keys()).flatMap((id) =>
       map.current
         .queryRenderedFeatures(e.point, { layers: [id] })
         .map((feature) => ({ ...feature, sourceId: id }))
@@ -196,10 +200,10 @@ const MapComponenet = ({
   }
 
   function clearMap() {
-    for (let val of layersAdded) {
-      map.current.removeLayer(val);
-      map.current.removeSource(val);
-      layersAdded.delete(val);
+    for (let [key,val] of layersAdded) {
+      map.current.removeLayer(key);
+      map.current.removeSource(key);
+      layersAdded.delete(key);
     }
 
     pointsAdded.clear();
@@ -307,23 +311,9 @@ const MapComponenet = ({
         type: 'raster'
       });
 
-      for (let val of layersAdded) {
-        map.current.removeLayer(val);
-        map.current.addLayer({
-          id: val,
-          slot: 'top',
-          type: "line",
-          source: val,
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            "line-color": "#FFD700",
-            "line-width": 6,
-            "line-opacity": 1,
-          },
-        });
+      for (let [key,val] of layersAdded) {
+        map.current.removeLayer(key);
+        addLayerFromSourceId(key);
       }
   },[overlaidMap])
 
@@ -371,33 +361,20 @@ const MapComponenet = ({
   }, [focusedFeature]);
 
   useEffect(()=> {
-    console.log("Setting base map " + baseMap)
+    for (let [key,val] of layersAdded) {
+      map.current.removeLayer(key);
+      map.current.removeSource(key);
+    }
     let mapTile = baseMaps[baseMap];
     map.current.setStyle(mapTile);
 
-    map.current.on("style.load", () => {
-      for (let val of layersAdded) {
-        map.current.removeLayer(val);
-        map.current.addLayer({
-          id: val,
-          type: "line",
-          source: val,
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            "line-color": "#FFD700",
-            "line-width": 6,
-            "line-opacity": 1,
-          },
-        });
-      }
-
+    map.current.on("style.load",()=>{
+    for (let [key,val] of layersAdded) {
+      addStoryObj(key, val);
+    }
     })
-
-
   }, [baseMap])
+
   function processSelectedTheme(id) {
     console.log(themeStoryList);
     for (let index = 0; index < themeStoryList[id].length; index++) {

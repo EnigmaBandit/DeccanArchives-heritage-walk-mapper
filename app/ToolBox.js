@@ -29,6 +29,11 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
     }
 
     let selectTheme = (themeID) => {
+      if (selectedFeature.length!=0 && selectedFeature[0]=='theme' && selectedFeature[1]==themeID) {
+        console.log("Theme is same");
+        return ;
+      }
+      console.log("Theme is NOT same");
         setSearchTerm('');
         setSelectedFeature(['theme' , themeID]);
         setDisplayedContent(['theme' , themeID]);
