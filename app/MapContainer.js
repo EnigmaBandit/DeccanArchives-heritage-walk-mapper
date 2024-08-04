@@ -28,14 +28,19 @@ const baseMaps = {
 }
 
 function createCustomMarkerElement(pointId) {
-  const div = document.createElement("div");
-  div.className = "custom-marker w-4 h-4 rounded-full z-10 bg-orange-500";
-  div.id = `point:${pointId}`;
-  div.onclick = (e) => {
-    e.stopPropagation();
-    handleMarkerClick(pointId);
-  };
-  return div;
+  const el = document.createElement("div");
+  el.className = "custom-marker";
+  el.style.width = "15px";
+  el.style.height = "15px";
+  el.style.borderRadius = "50%";
+  el.style.backgroundColor = "#FF8C00";
+  el.style.zIndex = "3"; // Set a high z-index
+  el.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent the click from reaching the map
+    console.log("clicked on marker", pointId);
+    // Add your popup logic here
+  });
+  return el;
 }
 
 
@@ -244,6 +249,7 @@ const MapComponenet = ({
 
   useEffect(() => {
     window.handleStorySelect = (id) => {
+      console.log("ClickEd on feature ID" + id);
       if (displayedContent[0] == 'story' && displayedContent[1] == id && displayedContent[2] == -1) {
         return;
       }
@@ -477,29 +483,6 @@ const MapComponenet = ({
                 direction
               );
   }
-
-  // useEffect(()=>{
-  //   if(displayedContent.length === 0 || displayedContent[0]!='story') {
-  //     return;
-  //   }
-
-   
-    
-  //   let storyId = displayedContent[1];
-  //   let pointIndex = displayedContent[2];
-  //   console.log("pointIndex is : " + pointIndex);    
-  //   if(pointIndex > 0) {
-  //     let layerId = storyId + ':' + (pointIndex-1).toString();
-  //     console.log("LAYER ID : " + layerId);
-  //     let geoObj = layersAdded.get(layerId);
-  //       console.log(geoObj);
-  //     let pathCoord = layersAdded.get(layerId)['features'][0]['geometry']['coordinates'][0];
-  //     startAnimation(layerId, pathCoord);
-      
-  //   }
-
-
-  // }, [displayedContent])
 
   let overallBbox;
 

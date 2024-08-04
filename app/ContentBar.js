@@ -11,7 +11,6 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
   const [themeList, setThemeList] = useState([]);
-  const [obj, setObj] = useState(null);
   const [objType, setObjType] = useState('');
   const [totalPages, settotalPages] = useState(1);
 
@@ -22,7 +21,6 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
     setDescription('');
     setImage('');
     setThemeList([]);
-    setObj(null);
     settotalPages(1);
 
   }
@@ -35,20 +33,25 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
     if (displayedContent.length === 0) {
       return;
     }
+    let selectedObj = null;
 
     setIsOpen(true);
     let id = displayedContent[1];
     console.log("id : "+ id);
-    if (displayedContent[0]==='story') {
-      setCurrentPage(displayedContent[2] + 2);
+    if (displayedContent[0]=='story') {
+      console.log("GOING INSIDE STORY");
+      let page = displayedContent[2] + 2;
+      setCurrentPage(page);
       settotalPages( stories[id]['pointsIncluded'].length + 1);
-      if (currentPage == 1) {
+      if (page == 1) {
+        console.log("plain story");
         setObjType('story');
-        setObj(stories[id]);
+        selectedObj = stories[id];
       } else {
         setObjType('point');
         let pointId = stories[id]['pointsIncluded'][displayedContent[2]];
-        setObj(points[pointId]);
+        selectedObj = points[pointId];
+        console.log("story point");
       }
       console.log("Setting story");
       
@@ -56,39 +59,47 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
     } else if (displayedContent[0]==='theme') {
       console.log("Setting theme");
       setObjType('theme');
-      setObj(themes[id]);
+      selectedObj = themes[id];
     } else if (displayedContent[0]==='point') {
       console.log("Setting point");
       setObjType('point');
-      setObj(points[id]);
+      selectedObj = points[id];
     } else {
       console.log("not allowed");
     }
+    setTitle(selectedObj['name']);
+    setImage(selectedObj['image']);
+    setDescription(selectedObj['desc']); 
+    if (displayedContent[0]=='point') {
+      setThemeList(selectedObj['themes'])
+    }
 
-    //get info
-    console.log(obj);
+    if (displayedContent[0]=='story') {
+      setThemeList(selectedObj['themes'])
+    }
+
     
   }, [displayedContent])
 
 
 
-  useEffect(()=>{
-    console.log("obj change");
-    if (obj == null) {
-      return;
-    }
-    setTitle(obj['name']);
-    setImage(obj['image']);
-    setDescription(obj['desc']);
+  // useEffect(()=>{
+  //   console.log("obj change");
+  //   if (obj == null) {
+  //     return;
+  //   }
+  //  setTitle(obj['name']);
+  //   setImage(obj['image']);
+  //   setDescription(obj['desc']); 
 
-    if (displayedContent[0]=='point') {
-      setThemeList(obj['themes'])
-    }
+  //   if (displayedContent[0]=='point') {
+  //     setThemeList(obj['themes'])
+  //   }
 
-    if (displayedContent[0]=='story') {
-      setThemeList(obj['themes'])
-    }
-  }, [obj])
+  //   if (displayedContent[0]=='story') {
+  //     setThemeList(obj['themes'])
+  //   }
+  // }, [obj])
 
   const [currentPage, setCurrentPage] = useState(1);
 

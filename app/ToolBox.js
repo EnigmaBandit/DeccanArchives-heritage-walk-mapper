@@ -23,20 +23,12 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
     let selectStory = (singleDict) => {
         setSearchTerm(singleDict[1]);
         setfilteredWords([]);
-        if (selectedFeature.length!=0 && selectedFeature[0]=='story' && selectedFeature[1]==singleDict[0]) {
-          console.log("Story is same");
-          return ;
-        }
         setSelectedFeature(['story' , singleDict[0]]);
         setDisplayedContent(['story' , singleDict[0], -1])
         setFocusedFeature(['story' , singleDict[0]]);
     }
 
     let selectTheme = (themeID) => {
-      if (selectedFeature.length!=0 && selectedFeature[0]=='theme' && selectedFeature[1]==themeID) {
-        console.log("Theme is same");
-        return ;
-      }
       console.log("Theme is NOT same");
         setSearchTerm('');
         setSelectedFeature(['theme' , themeID]);
@@ -71,7 +63,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
       <div>
         <div className="flex items-center mt-2">
             <form className="  w-[450px] ml-5  bg-white shadow-md rounded-full">
-                  <input type="search" placeholder="Type Here" className=" bg-transparent rounded-full pl-5 h-8 w-[95%] "
+                  <input type="search" placeholder="Search Heritage Walks" className=" bg-transparent rounded-full pl-5 h-8 w-[95%] "
                     value={searchTerm}
                     onChange={handleSearch} />
             </form>
