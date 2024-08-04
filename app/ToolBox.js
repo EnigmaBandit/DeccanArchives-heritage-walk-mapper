@@ -23,6 +23,10 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
     let selectStory = (singleDict) => {
         setSearchTerm(singleDict[1]);
         setfilteredWords([]);
+        if (selectedFeature.length!=0 && selectedFeature[0]=='story' && selectedFeature[1]==singleDict[0]) {
+          console.log("Story is same");
+          return ;
+        }
         setSelectedFeature(['story' , singleDict[0]]);
         setDisplayedContent(['story' , singleDict[0], -1])
         setFocusedFeature(['story' , singleDict[0]]);

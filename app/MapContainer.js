@@ -27,6 +27,18 @@ const baseMaps = {
   "Satellite" : "mapbox://styles/mapbox/satellite-streets-v12"
 }
 
+function createCustomMarkerElement(pointId) {
+  const div = document.createElement("div");
+  div.className = "custom-marker w-4 h-4 rounded-full z-10 bg-orange-500";
+  div.id = `point:${pointId}`;
+  div.onclick = (e) => {
+    e.stopPropagation();
+    handleMarkerClick(pointId);
+  };
+  return div;
+}
+
+
 const MapComponenet = ({
   selectedFeature,
   setSelectedFeature,
@@ -82,48 +94,6 @@ const MapComponenet = ({
     });
   }
 
-  //function createCustomMarkerElement(pointId) {
-  //   // const div = document.createElement("div");
-  //   // const root = ReactDOM.createRoot(div);
-  //   // root.render(
-  //   // <div
-  //   //   className="custom-marker"
-  //   //   id={`point:${pointId}`}
-  //   //   style={{
-  //   //     width: "15px",
-  //   //     height: "15px",
-  //   //     borderRadius: "50%",
-  //   //     backgroundColor: "#FF8C00",
-  //   //     zIndex: 10,
-  //   //   }}
-  //   //   onClick={(e) => {
-  //   //     e.stopPropagation();
-  //   //     onClick(e); // Call the provided onClick handler
-  //   //   }}
-  //   // />)
-  //   // return div;
-  // }
-
-  function createCustomMarkerElement(pointId) {
-    const div = document.createElement("div");
-    const root = ReactDOM.createRoot(div);
-    
-  
-  
-    root.render(
-      <div
-        className={`custom-marker w-4 h-4 rounded-full z-10 bg-orange-500"`}
-        id={`point:${pointId}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleMarkerClick(pointId); // Handle marker click
-        }}
-      />
-    );
-    
-    return div;
-  }
-  
   function handleMarkerClick(pointId) {
     // Set the selected feature to this point
     setDisplayedContent(["point", pointId]);
@@ -163,6 +133,7 @@ const MapComponenet = ({
   }
 
   function displayStory(storyId) {
+    console.log("in displaystory");
     if (storiesAdded.has(storyId)) {
       return;
     }
@@ -198,10 +169,10 @@ const MapComponenet = ({
     
   }
 
-
-
-    for (var i in story["pointsIncluded"]) {
-      var pointId = story["pointsIncluded"][i].toString();
+  console.log("adding points included");;
+  console.log(story["pointsIncluded"])
+    for (let i in story["pointsIncluded"]) {
+      let pointId = story["pointsIncluded"][i].toString();
       displayMarker(pointId);
     }
   }
@@ -238,7 +209,7 @@ const MapComponenet = ({
               ${storyIds
                 .map(
                   (id) => `
-                <button onclick="window.handleStorySelect('${id}')">
+                <button onclick="window.handleStorySelect('${id.split(':')[0]}')">
                   ${stories[id.split(':')[0]].name}
                 </button>
               `
@@ -263,12 +234,19 @@ const MapComponenet = ({
       layersAdded.delete(key);
     }
 
+    for (let val of storiesAdded) {
+      storiesAdded.delete(val);
+    }
+
     pointsAdded.clear();
     mapMarkers.forEach((marker) => marker.remove());
   }
 
   useEffect(() => {
     window.handleStorySelect = (id) => {
+      if (displayedContent[0] == 'story' && displayedContent[1] == id && displayedContent[2] == -1) {
+        return;
+      }
       setSelectedFeature(["story", id]);
       setDisplayedContent(["story", id, -1]);
       popup.current.remove();

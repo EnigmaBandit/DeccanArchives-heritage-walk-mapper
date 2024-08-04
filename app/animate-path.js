@@ -1,7 +1,8 @@
 import * as turf from "@turf/turf";
-
+let finished = false;
 const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, direction ) => {
     return new Promise(async (resolve) => {
+
       let lineStringObj = turf.lineString(path);
       const pathDistance = turf.length(lineStringObj);
       //1 seconds for 300 meters in milli seconds
@@ -16,12 +17,17 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
 
   
       const frame = async (currentTime) => {
+        if (finished == true) {
+          finished = false;
+          resolve();
+          return;
+        }
         if (!startTime) startTime = currentTime;
         let timeDiff = currentTime - startTime;
         let animationPhase = timeDiff/ duration;
         if (animationPhase > 1) {
-          resolve();
-          return;
+          finished  = true;
+          animationPhase =1;
         }
         if (direction == "previous") {
           animationPhase = 1- animationPhase;
@@ -34,6 +40,7 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
           lng: alongPath[0],
           lat: alongPath[1],
         };
+        console.log(animationPhase)
         
         map.setPaintProperty(layerId, 'line-gradient', [
           'step',
