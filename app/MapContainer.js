@@ -7,6 +7,7 @@ import * as turf from "@turf/turf";
 import ContentBar from "./ContentBar";
 import MapSourceControl from "./MapSourceControl";
 import { FaMap } from "react-icons/fa";
+import animatePath from  "./animate-path"
 const apiKey = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
 if (apiKey) {
@@ -18,6 +19,7 @@ mapboxgl.accessToken = apiKey;
 
 let layersAdded = new Map();
 let pointsAdded = new Set();
+let storiesAdded = new Set();
 let mapMarkers = [];
 
 const baseMaps = {
@@ -80,26 +82,59 @@ const MapComponenet = ({
     });
   }
 
+  //function createCustomMarkerElement(pointId) {
+  //   // const div = document.createElement("div");
+  //   // const root = ReactDOM.createRoot(div);
+  //   // root.render(
+  //   // <div
+  //   //   className="custom-marker"
+  //   //   id={`point:${pointId}`}
+  //   //   style={{
+  //   //     width: "15px",
+  //   //     height: "15px",
+  //   //     borderRadius: "50%",
+  //   //     backgroundColor: "#FF8C00",
+  //   //     zIndex: 10,
+  //   //   }}
+  //   //   onClick={(e) => {
+  //   //     e.stopPropagation();
+  //   //     onClick(e); // Call the provided onClick handler
+  //   //   }}
+  //   // />)
+  //   // return div;
+  // }
+
   function createCustomMarkerElement(pointId) {
-    const el = document.createElement("div");
-    el.className = "custom-marker";
-    el.style.width = "15px";
-    el.style.height = "15px";
-    el.style.borderRadius = "50%";
-    el.style.backgroundColor = "#FF8C00";
-    el.style.zIndex = "10"; // Set a high z-index
-    el.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent the click from reaching the map
-      console.log("clicked on marker", pointId);
-      // Add your popup logic here
-    });
-    return el;
+    const div = document.createElement("div");
+    const root = ReactDOM.createRoot(div);
+    
+  
+  
+    root.render(
+      <div
+        className={`custom-marker w-4 h-4 rounded-full z-10 bg-orange-500"`}
+        id={`point:${pointId}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleMarkerClick(pointId); // Handle marker click
+        }}
+      />
+    );
+    
+    return div;
   }
+  
+  function handleMarkerClick(pointId) {
+    // Set the selected feature to this point
+    setDisplayedContent(["point", pointId]);
+  }
+  
 
   function addStoryObj (id, storyObj) {
     map.current.addSource(id, {
       type: "geojson",
       data: storyObj,
+      lineMetrics: true,
     });
     addLayerFromSourceId(id);
   }
@@ -115,33 +150,55 @@ const MapComponenet = ({
         "line-cap": "round",
       },
       paint: {
-        "line-color": "#FFD700",
+        "line-color": [
+          "case",
+          ["==", ["get", "id"], 1], // Replace 1 with the id of the feature you want to style
+          "#808080", // Initial color for the selected feature
+          "#808080"  // Color for other features
+        ],
         "line-width": 6,
         "line-opacity": 1,
       },
     });
   }
 
-  function displayStory(id) {
-    if (layersAdded.has(id)) {
+  function displayStory(storyId) {
+    if (storiesAdded.has(storyId)) {
       return;
     }
-    var story = stories[id];
+    storiesAdded.add(storyId);
+    var story = stories[storyId];
     var coordString = story["coord"];
     var storyObj = JSON.parse(coordString);
-    layersAdded.set(id, storyObj);
-    addStoryObj(id, storyObj);
+    console.log("PARENT GEOJSON");
+    console.log(storyObj);
+  let separatedGeoJSONs = [];
 
+  for (let i = 0 ; i < storyObj.features.length ; i++) {
+    let newGeoJSON = {
+      crs: storyObj.crs,
+      type: 'FeatureCollection',
+      features: [  storyObj.features[i]]
+    };
+    console.log("ADDing geojson : " )
+    console.log(newGeoJSON);
+    let layerId = storyId + ":" + i;
+    layersAdded.set(layerId, newGeoJSON);
+    addStoryObj(layerId, newGeoJSON);
 
     // Change the cursor to a pointer when hovering over the polyline layer
-    map.current.on("mouseenter", id, () => {
+    map.current.on("mouseenter", layerId, () => {
       map.current.getCanvas().style.cursor = "pointer";
     });
 
     // Change it back when it leaves
-    map.current.on("mouseleave", id, () => {
+    map.current.on("mouseleave", layerId, () => {
       map.current.getCanvas().style.cursor = "";
     });
+    
+  }
+
+
 
     for (var i in story["pointsIncluded"]) {
       var pointId = story["pointsIncluded"][i].toString();
@@ -182,7 +239,7 @@ const MapComponenet = ({
                 .map(
                   (id) => `
                 <button onclick="window.handleStorySelect('${id}')">
-                  ${stories[id].name}
+                  ${stories[id.split(':')[0]].name}
                 </button>
               `
                 )
@@ -318,7 +375,13 @@ const MapComponenet = ({
   },[overlaidMap])
 
   useEffect(() => {
+
+    let startAnimation = async(storyId, pathCoord, direction) =>{
+      await animateAcrossStoryPath(storyId, pathCoord, direction)
+    }
     let featureType = focusedFeature[0];
+    console.log("Selected FEature type " + featureType);
+    console.log(focusedFeature);
     let id = focusedFeature[1];
     map.current.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
     if (featureType === "story") {
@@ -351,14 +414,52 @@ const MapComponenet = ({
         padding: { top: 100, bottom: 100, left: 600, right: 100 },
       });
     } else if (featureType === "point") {
+      updateMarkerStyles();
       let point = points[id];
       let coord = JSON.parse(point["coord"]);
       map.current.easeTo({
         center: coord,
         padding: { left: 600, top: 100, right: 100, bottom: 100 },
       });
+    } else if (featureType === "pathWithinStory") {
+      let direction = focusedFeature[1];
+      console.log("DIRECTIO HERE IS : " + direction);
+      let storyId = focusedFeature[2];
+      let pathindex = focusedFeature[3];
+      let layerId = storyId + ':' + pathindex;
+      console.log("LAYER ID : " + layerId);
+      let geoObj = layersAdded.get(layerId);
+      console.log(geoObj);
+      let pathCoord = layersAdded.get(layerId)['features'][0]['geometry']['coordinates'][0];
+      // if (direction === 'previous') {
+      //   console.log("THIS IS PREVIOS");
+      //   console.log("BEFORE REVERSE");
+      //   console.log(pathCoord);
+      //   pathCoord = [...pathCoord].reverse()
+      //   console.log("AFTER REVERSE");
+      //   console.log(pathCoord);
+      // } else {
+      //   console.log("NEXT");
+      // }
+      
+      startAnimation(layerId, pathCoord, direction);
     }
   }, [focusedFeature]);
+
+
+  function updateMarkerStyles() {
+    // Loop through all points and update their styles
+    pointsAdded.forEach((pointId) => {
+      const markerElement = document.getElementById(`point:${pointId}`);
+  
+      if (markerElement) {
+        const isSelected = focusedFeature[0] === 'point' && focusedFeature[1] === pointId;
+  
+        // Apply the appropriate styles using Tailwind classes
+        markerElement.className = `custom-marker w-4 h-4 rounded-full z-10 ${isSelected ? "bg-blue-500" : "bg-orange-500"}`;
+      }
+    });
+  }
 
   useEffect(()=> {
     for (let [key,val] of layersAdded) {
@@ -386,6 +487,41 @@ const MapComponenet = ({
   function processSelectedStory(id) {
     displayStory(id);
   }
+
+  async function animateAcrossStoryPath(id, path, direction) {
+    console.log("Before caling path is:")
+    console.log(path);
+    await animatePath(map.current,
+                path,
+                id,
+                "yellow",
+                "#808080",
+                direction
+              );
+  }
+
+  // useEffect(()=>{
+  //   if(displayedContent.length === 0 || displayedContent[0]!='story') {
+  //     return;
+  //   }
+
+   
+    
+  //   let storyId = displayedContent[1];
+  //   let pointIndex = displayedContent[2];
+  //   console.log("pointIndex is : " + pointIndex);    
+  //   if(pointIndex > 0) {
+  //     let layerId = storyId + ':' + (pointIndex-1).toString();
+  //     console.log("LAYER ID : " + layerId);
+  //     let geoObj = layersAdded.get(layerId);
+  //       console.log(geoObj);
+  //     let pathCoord = layersAdded.get(layerId)['features'][0]['geometry']['coordinates'][0];
+  //     startAnimation(layerId, pathCoord);
+      
+  //   }
+
+
+  // }, [displayedContent])
 
   let overallBbox;
 

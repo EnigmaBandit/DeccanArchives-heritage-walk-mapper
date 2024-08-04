@@ -123,22 +123,28 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
   const handlePrevious = () => {
     setCurrentPage(currentPage - 1);
     console.log("current page is : " + currentPage);
-    setDisplayedContent(['story', selectedFeature[1], displayedContent[2] - 1]);
+    let storyId = selectedFeature[1];
+    setDisplayedContent(['story', storyId, displayedContent[2] - 1]);
     let pointIndex =  displayedContent[2] - 1;
     if (pointIndex == -1) {
-      setFocusedFeature(["story", selectedFeature[1]]);
+      setFocusedFeature(["story", storyId]);
     } else {
-      let pointId = stories[selectedFeature[1]]['pointsIncluded'][pointIndex];
-      setFocusedFeature(["point", pointId]);
+      setFocusedFeature(["pathWithinStory", "previous", storyId, pointIndex ])
     }
     
   };
 
   const handleNext = () => {
     setCurrentPage(currentPage + 1);
-    setDisplayedContent(['story', selectedFeature[1], displayedContent[2] +1]);
-    let pointId = stories[selectedFeature[1]]['pointsIncluded'][displayedContent[2] + 1];
-    setFocusedFeature(["point", pointId]);
+    let pointIndex =  displayedContent[2] + 1;
+    let storyId = selectedFeature[1];
+    setDisplayedContent(['story', selectedFeature[1], pointIndex]);
+    if (pointIndex === 0) {
+      let pointId = stories[selectedFeature[1]]['pointsIncluded'][displayedContent[2] + 1];
+      setFocusedFeature(["point", pointId]);
+    } else {
+      setFocusedFeature(["pathWithinStory", "next", storyId, pointIndex -1])
+    }
   };
 
   if (!isOpen) return null;
