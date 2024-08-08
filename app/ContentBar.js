@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { IoCloseOutline, IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
 
 
-const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setFocusedFeature, stories, points, themes, selectedFeature, setSelectedFeature}) => {
+const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setFocusedFeature, stories, points, themes, selectedFeature, setSelectedFeature, setSearchTerm}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [titleFontSize, setTitleFontSize] = useState(30);
   const titleRef = useRef(null);
@@ -125,6 +125,7 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
   }, [title]);
 
   const handleClose = () => {
+    setSearchTerm('');
     setDisplayedContent([]);
     setSelectedFeature([]);
     setIsOpen(false);

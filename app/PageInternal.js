@@ -20,13 +20,14 @@ const PageInternal = ({storyNamesList, themeStoryList,  themes, stories, points,
   const [selectedFeature, setSelectedFeature] = useState({});
   const [displayedContent, setDisplayedContent] = useState([]);
   const [focusedFeature, setFocusedFeature] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   console.log("TEJAS");
   console.log(stories);
   return (
     <>
-    <Toolbox selectedFeature={selectedFeature} setSelectedFeature={setSelectedFeature} setDisplayedContent={setDisplayedContent} focusedFeature={focusedFeature} setFocusedFeature={setFocusedFeature} storyNamesList={storyNamesList} themes={themes}/>
-    <MapComponenet  selectedFeature={selectedFeature} setSelectedFeature={setSelectedFeature} displayedContent={displayedContent} setDisplayedContent={setDisplayedContent} focusedFeature={focusedFeature} setFocusedFeature={setFocusedFeature} stories={stories} points={points} themes={themes} themeStoryList={themeStoryList} referencedMaps={referencedMaps}/>
+    <Toolbox selectedFeature={selectedFeature} setSelectedFeature={setSelectedFeature} setDisplayedContent={setDisplayedContent} focusedFeature={focusedFeature} setFocusedFeature={setFocusedFeature} storyNamesList={storyNamesList} themes={themes} searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
+    <MapComponenet  selectedFeature={selectedFeature} setSelectedFeature={setSelectedFeature} displayedContent={displayedContent} setDisplayedContent={setDisplayedContent} focusedFeature={focusedFeature} setFocusedFeature={setFocusedFeature} stories={stories} points={points} themes={themes} themeStoryList={themeStoryList} referencedMaps={referencedMaps} setSearchTerm={setSearchTerm}/>
     </>
   )
 

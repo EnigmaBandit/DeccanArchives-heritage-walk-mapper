@@ -56,6 +56,7 @@ const MapComponenet = ({
   themes,
   themeStoryList,
   referencedMaps,
+  setSearchTerm,
 }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -568,6 +569,7 @@ const MapComponenet = ({
         themes={themes}
         selectedFeature={selectedFeature}
         setSelectedFeature={setSelectedFeature}
+        setSearchTerm={setSearchTerm}
       />
     </div>
   );

@@ -2,10 +2,8 @@
 import Link from 'next/link';
 import React, { useState, useEffect, useRef } from 'react';
 
-const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focusedFeature, setFocusedFeature, storyNamesList, themes}) => {
+const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focusedFeature, setFocusedFeature, storyNamesList, themes, searchTerm, setSearchTerm}) => {
 
-     
-    const [searchTerm, setSearchTerm] = useState('');
     const [filteredWords, setFilteredWords] = useState();
     const searchInputRef = useRef(false);
     const [isSearchSelected, setIsSearchSelected] = useState(false);
@@ -14,7 +12,9 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
       const handleClickOutside = (event) => {
         if (searchInputRef.current && !searchInputRef.current.contains(event.target)) {
           if (selectedFeature.length == 0) {
+            console.log("refreshing search term to none")
             setSearchTerm('');
+            searchInputRef.current = false;
           }
           
           setFilteredWords(storyNamesList);
@@ -40,6 +40,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
     } ;
 
     let selectStory = (singleDict) => {
+      console.log("story searching is : " +singleDict[1] );
         setSearchTerm(singleDict[1]);
         setFilteredWords([]);
         setSelectedFeature(['story' , singleDict[0]]);
