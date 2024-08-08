@@ -6,23 +6,42 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
 
      
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredWords, setfilteredWords] = useState([]);
+    const [filteredWords, setFilteredWords] = useState();
+    const searchInputRef = useRef(false);
+    const [isSearchSelected, setIsSearchSelected] = useState(false);
+
+
+      const handleClickOutside = (event) => {
+        if (searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+          if (selectedFeature.length == 0) {
+            setSearchTerm('');
+          }
+          
+          setFilteredWords(storyNamesList);
+          setIsSearchSelected(false);
+        }
+      };
+  
+      document.addEventListener('click', handleClickOutside);
+
+
 
     let handleSearch = (event) => {
-        console.log(themes )
         let term = event.target.value.toLowerCase();
-        console.log("CHANGEd " + term);
         setSearchTerm(event.target.value);
         let filtered = storyNamesList.filter(word => word[1].toLowerCase().includes(term));
-        console.log('filtered list');
-        console.log(filtered)
-        setfilteredWords(filtered);
+        setFilteredWords(filtered);
         
     };
+    let handleSelect = (event) => {
+      setFilteredWords(storyNamesList);
+      setSearchTerm('');
+      setIsSearchSelected(true);
+    } ;
 
     let selectStory = (singleDict) => {
         setSearchTerm(singleDict[1]);
-        setfilteredWords([]);
+        setFilteredWords([]);
         setSelectedFeature(['story' , singleDict[0]]);
         setDisplayedContent(['story' , singleDict[0], -1])
         setFocusedFeature(['story' , singleDict[0]]);
@@ -62,10 +81,11 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
       </nav>
       <div>
         <div className="flex items-center mt-2">
-            <form className="  w-[450px] ml-5  bg-white shadow-md rounded-full">
+            <form className="  w-[450px] ml-5  bg-white shadow-md rounded-full" ref={searchInputRef}>
                   <input type="search" placeholder="Search Heritage Walks" className=" bg-transparent rounded-full pl-5 h-8 w-[95%] "
                     value={searchTerm}
-                    onChange={handleSearch} />
+                    onChange={handleSearch} 
+                    onClick ={handleSelect}/>
             </form>
             <div className=" flex-grow my-auto">
                 {Object.entries(themes).map(([key, value]) => (
@@ -81,7 +101,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
         </div>
         
         {
-            searchTerm.length > 0 && (
+            isSearchSelected  && (
                 <div className=" bg-white rounded-xl w-[450px] ml-5 mt-1 flex flex-col z-[3]  ">
                         {
                         filteredWords.map((singleDict, index) => (
