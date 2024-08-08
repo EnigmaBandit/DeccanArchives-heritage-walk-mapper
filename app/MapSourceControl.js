@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
-import { FaSearch, FaMapMarkerAlt, FaLayerGroup, FaAdjust } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaMapMarkerAlt, FaLayerGroup, FaAdjust } from 'react-icons/fa';
 
 const historicalMaps = [
   ["None", ''],
   ["Durgam Cheruvu", "tejasarora5.c65pooux"]
 ];
 
-const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, setOverlaidMap }) => {
+const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, overlaidMap, setOverlaidMap, setOverlaidMapOpacity }) => {
   const [selectedMap, setSelectedMap] = useState('');
+  const [opacity, setOpacity] = useState(100);
 
-  console.log("selecting + ");
-  console.log()
-
-  if (!showOptions) return null;
+  useEffect(() => {
+    if (overlaidMap === '') {
+      setOpacity(100);
+      setOverlaidMapOpacity(100);
+    }
+  }, [overlaidMap, setOverlaidMapOpacity]);
 
   const handleMapChange = (event) => {
     const selectedValue = event.target.value;
@@ -22,6 +25,14 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
       setOverlaidMap(selectedMapData[1]);
     }
   };
+
+  const handleOpacityChange = (event) => {
+    const newOpacity = parseInt(event.target.value);
+    setOpacity(newOpacity);
+    setOverlaidMapOpacity(newOpacity);
+  };
+
+  if (!showOptions) return null;
 
   return (
     <div className="absolute z-10 bottom-24 right-12 bg-white p-6 rounded-lg shadow-md w-72 backdrop-filter backdrop-blur-lg bg-opacity-90">
@@ -48,7 +59,6 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
           className="w-full p-2 bg-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={selectedMap}
           onChange={handleMapChange}
-          maxLength={50}
         >
           {historicalMaps.map((map, index) => (
             <option key={index} value={map[0]}>
@@ -66,7 +76,10 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, se
           type="range"
           min="0"
           max="100"
+          value={opacity}
+          onChange={handleOpacityChange}
           className="w-full accent-blue-500"
+          disabled={overlaidMap === ''}
         />
       </div>
     </div>

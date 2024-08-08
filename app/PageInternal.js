@@ -3,6 +3,19 @@ import Toolbox from './ToolBox'
 import MapComponenet from './MapContainer'
 import React, { useEffect, useState } from 'react';
 
+export let toggleMapInteractions = (map, enable) => {
+  const interactiveHandlers = ['dragPan', 'scrollZoom', 'boxZoom', 'dragRotate', 'keyboard', 'doubleClickZoom', 'touchZoomRotate'];
+  
+  interactiveHandlers.forEach(handler => {
+    if (enable) {
+      map[handler].enable();
+    } else {
+      map[handler].disable();
+    }
+  });
+};
+
+
 const PageInternal = ({storyNamesList, themeStoryList,  themes, stories, points}) => {
   const [selectedFeature, setSelectedFeature] = useState({});
   const [displayedContent, setDisplayedContent] = useState([]);

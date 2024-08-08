@@ -64,7 +64,11 @@ const MapComponenet = ({
   const [showOptions, setShowOptions] = useState(false);
   const [baseMap, setBaseMap] = useState("Street");
   const [overlaidMap, setOverlaidMap] = useState('');
+  const [overlaidMapOpacity, setOverlaidMapOpacity] = useState();
   const [isoverloadDisplayed, setIsoverloadDisplayed] = useState(false);
+  const isOverlayDisplayedRef = useRef(false);
+  const overlaidMapRef = useRef('');
+  let overlaidMapOpacityRef = useRef('');
 
   const popup = useRef(
     new mapboxgl.Popup({ closeButton: true, closeOnClick: false })
@@ -104,6 +108,13 @@ const MapComponenet = ({
     setDisplayedContent(["point", pointId]);
   }
   
+
+
+  useEffect(()=>{
+    console.log("isoverloadDisplayed is changed: " + isoverloadDisplayed);
+    isOverlayDisplayedRef.current = isoverloadDisplayed;
+    overlaidMapRef.current = overlaidMap;
+  },[isoverloadDisplayed])
 
   function addStoryObj (id, storyObj) {
     map.current.addSource(id, {
@@ -247,6 +258,19 @@ const MapComponenet = ({
     mapMarkers.forEach((marker) => marker.remove());
   }
 
+  useEffect(()=>{
+    if (!isOverlayDisplayedRef.current) {
+      return;
+    }
+    overlaidMapOpacityRef.current = overlaidMapOpacity;
+    map.current.setPaintProperty(
+      'overlaidMap',
+      'raster-opacity',
+      overlaidMapOpacity/100
+    );
+  }, [overlaidMapOpacity])
+
+
   useEffect(() => {
     window.handleStorySelect = (id) => {
       console.log("ClickEd on feature ID" + id);
@@ -344,12 +368,16 @@ const MapComponenet = ({
         url: tileSetUrl
       });
 
+      console.log("Adding with opacity: " + overlaidMapOpacity)
+
       map.current.addLayer({
         id: 'overlaidMap',
         slot: 'top',
-        beforeId :'referenceMap',
         source: 'overlaidMap',
-        type: 'raster'
+        type: 'raster',
+        'paint': {
+          'raster-opacity': overlaidMapOpacity/100 // Set the opacity to 0.5
+        }
       });
 
       for (let [key,val] of layersAdded) {
@@ -450,14 +478,44 @@ const MapComponenet = ({
       map.current.removeLayer(key);
       map.current.removeSource(key);
     }
-    let mapTile = baseMaps[baseMap];
-    map.current.setStyle(mapTile);
-
-    map.current.on("style.load",()=>{
-    for (let [key,val] of layersAdded) {
-      addStoryObj(key, val);
+    if (isOverlayDisplayedRef.current) {
+      console.log("removing source of overloid");
+      map.current.removeLayer('overlaidMap');
+      map.current.removeSource("overlaidMap");
+    } else {
+      console.log("NOT REMOVING source of overloid");
     }
-    })
+
+    let mapTile = baseMaps[baseMap];
+    map.current.setStyle(mapTile);      
+       map.current.on("style.load",()=>{
+      if (isOverlayDisplayedRef.current) {
+        console.log("is overload within that method");
+        let tileSetUrl = "mapbox://" + overlaidMapRef.current;
+        console.log("titleseturl: "  + tileSetUrl)
+          map.current.addSource('overlaidMap', {
+            type: 'raster',
+            url: tileSetUrl
+          });
+        console.log("overlaidMapOpacityRef.current: " + overlaidMapOpacityRef.current)
+        map.current.addLayer({
+          id: 'overlaidMap',
+          slot: 'top',
+          source: 'overlaidMap',
+          type: 'raster',
+          'paint': {
+            'raster-opacity': overlaidMapOpacityRef.current/100 
+          }
+        });
+
+      }
+
+      for (let [key,val] of layersAdded) {
+        addStoryObj(key, val);
+      }
+      })
+
+    
   }, [baseMap])
 
   function processSelectedTheme(id) {
@@ -494,7 +552,9 @@ const MapComponenet = ({
         setShowOptions={setShowOptions}
         baseMap = {baseMap}
         setBaseMap={setBaseMap}
+        overlaidMap={overlaidMap}
         setOverlaidMap={setOverlaidMap}
+        setOverlaidMapOpacity={setOverlaidMapOpacity}
       />
       <ContentBar
         displayedContent={displayedContent}
