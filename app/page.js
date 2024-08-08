@@ -5,6 +5,8 @@ import PageInternal from './PageInternal';
 let stories ;
 let points;
 let themes ;
+let referencedMaps = [];
+let referencedMapsInput;
 
 
 
@@ -14,8 +16,10 @@ export default async  function Home() {
     stories = dataJson['stories'];
     points = dataJson['points'];
     themes = dataJson['themes'];
-    console.log(stories);
-
+    referencedMapsInput = dataJson['ReferencedMaps'];
+    for (let key of Object.keys(referencedMapsInput)) {
+      referencedMaps.push([referencedMapsInput[key]['name'] , referencedMapsInput[key]['tile']])
+    }
     let storyNamesList =[];
     let themeStoryList = {};
 
@@ -34,7 +38,7 @@ export default async  function Home() {
 
   return (
     <>
-    <PageInternal storyNamesList={storyNamesList} themeStoryList={themeStoryList} themes={themes} stories={stories} points={points}/>
+    <PageInternal storyNamesList={storyNamesList} themeStoryList={themeStoryList} themes={themes} stories={stories} points={points} referencedMaps={referencedMaps}/>
     </>
   )
 

@@ -55,6 +55,7 @@ const MapComponenet = ({
   points,
   themes,
   themeStoryList,
+  referencedMaps,
 }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -63,7 +64,7 @@ const MapComponenet = ({
   const [zoom, setZoom] = useState(10);
   const [showOptions, setShowOptions] = useState(false);
   const [baseMap, setBaseMap] = useState("Street");
-  const [overlaidMap, setOverlaidMap] = useState('');
+  const [overlaidMap, setOverlaidMap] = useState('None');
   const [overlaidMapOpacity, setOverlaidMapOpacity] = useState();
   const [isoverloadDisplayed, setIsoverloadDisplayed] = useState(false);
   const isOverlayDisplayedRef = useRef(false);
@@ -357,7 +358,7 @@ const MapComponenet = ({
     map.current.removeLayer('overlaidMap');
     map.current.removeSource('overlaidMap');
     }
-    if(overlaidMap ==='') {
+    if(overlaidMap ==='None') {
       setIsoverloadDisplayed(false);
       return;
     }
@@ -555,6 +556,7 @@ const MapComponenet = ({
         overlaidMap={overlaidMap}
         setOverlaidMap={setOverlaidMap}
         setOverlaidMapOpacity={setOverlaidMapOpacity}
+        referencedMaps={referencedMaps}
       />
       <ContentBar
         displayedContent={displayedContent}

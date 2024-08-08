@@ -16,7 +16,7 @@ export let toggleMapInteractions = (map, enable) => {
 };
 
 
-const PageInternal = ({storyNamesList, themeStoryList,  themes, stories, points}) => {
+const PageInternal = ({storyNamesList, themeStoryList,  themes, stories, points, referencedMaps}) => {
   const [selectedFeature, setSelectedFeature] = useState({});
   const [displayedContent, setDisplayedContent] = useState([]);
   const [focusedFeature, setFocusedFeature] = useState([]);
@@ -26,7 +26,7 @@ const PageInternal = ({storyNamesList, themeStoryList,  themes, stories, points}
   return (
     <>
     <Toolbox selectedFeature={selectedFeature} setSelectedFeature={setSelectedFeature} setDisplayedContent={setDisplayedContent} focusedFeature={focusedFeature} setFocusedFeature={setFocusedFeature} storyNamesList={storyNamesList} themes={themes}/>
-    <MapComponenet  selectedFeature={selectedFeature} setSelectedFeature={setSelectedFeature} displayedContent={displayedContent} setDisplayedContent={setDisplayedContent} focusedFeature={focusedFeature} setFocusedFeature={setFocusedFeature} stories={stories} points={points} themes={themes} themeStoryList={themeStoryList}/>
+    <MapComponenet  selectedFeature={selectedFeature} setSelectedFeature={setSelectedFeature} displayedContent={displayedContent} setDisplayedContent={setDisplayedContent} focusedFeature={focusedFeature} setFocusedFeature={setFocusedFeature} stories={stories} points={points} themes={themes} themeStoryList={themeStoryList} referencedMaps={referencedMaps}/>
     </>
   )
 

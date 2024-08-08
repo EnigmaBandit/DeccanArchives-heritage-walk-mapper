@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { FaMapMarkerAlt, FaLayerGroup, FaAdjust } from 'react-icons/fa';
 
-const historicalMaps = [
-  ["None", ''],
-  ["Durgam Cheruvu", "tejasarora5.c65pooux"]
-];
 
-const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, overlaidMap, setOverlaidMap, setOverlaidMapOpacity }) => {
+const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, overlaidMap, setOverlaidMap, setOverlaidMapOpacity, referencedMaps}) => {
   const [selectedMap, setSelectedMap] = useState('');
   const [opacity, setOpacity] = useState(100);
+  console.log("referencedMaps are : ");
+  console.log(referencedMaps);
 
   useEffect(() => {
-    if (overlaidMap === '') {
+    if (overlaidMap == 'None') {
       setOpacity(100);
       setOverlaidMapOpacity(100);
     }
@@ -20,7 +18,7 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, ov
   const handleMapChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedMap(selectedValue);
-    const selectedMapData = historicalMaps.find(map => map[0] === selectedValue);
+    const selectedMapData = referencedMaps.find(map => map[0] === selectedValue);
     if (selectedMapData) {
       setOverlaidMap(selectedMapData[1]);
     }
@@ -60,7 +58,7 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, ov
           value={selectedMap}
           onChange={handleMapChange}
         >
-          {historicalMaps.map((map, index) => (
+          {referencedMaps.map((map, index) => (
             <option key={index} value={map[0]}>
               {map[0]}
             </option>
