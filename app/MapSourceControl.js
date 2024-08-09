@@ -9,11 +9,9 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, ov
   console.log(referencedMaps);
 
   useEffect(() => {
-    if (overlaidMap == 'None') {
       setOpacity(100);
       setOverlaidMapOpacity(100);
-    }
-  }, [overlaidMap, setOverlaidMapOpacity]);
+  }, [overlaidMap]);
 
   const handleMapChange = (event) => {
     const selectedValue = event.target.value;
@@ -77,7 +75,7 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, ov
           value={opacity}
           onChange={handleOpacityChange}
           className="w-full accent-blue-500"
-          disabled={overlaidMap === ''}
+          disabled={overlaidMap == 'None'}
         />
       </div>
     </div>

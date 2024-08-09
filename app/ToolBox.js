@@ -8,7 +8,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
     const searchInputRef = useRef(false);
     const [isSearchSelected, setIsSearchSelected] = useState(false);
 
-
+    useEffect(()=>{
       const handleClickOutside = (event) => {
         if (searchInputRef.current && !searchInputRef.current.contains(event.target)) {
           if (selectedFeature.length == 0) {
@@ -23,6 +23,8 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
       };
   
       document.addEventListener('click', handleClickOutside);
+
+    }, [isSearchSelected])
 
 
 

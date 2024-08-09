@@ -261,14 +261,14 @@ const MapComponenet = ({
   }
 
   useEffect(()=>{
+    overlaidMapOpacityRef.current = overlaidMapOpacity;
     if (!isOverlayDisplayedRef.current) {
       return;
     }
-    overlaidMapOpacityRef.current = overlaidMapOpacity;
     map.current.setPaintProperty(
       'overlaidMap',
       'raster-opacity',
-      overlaidMapOpacity/100
+      overlaidMapOpacityRef.current/100
     );
   }, [overlaidMapOpacity])
 
