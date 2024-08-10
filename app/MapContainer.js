@@ -20,8 +20,10 @@ mapboxgl.accessToken = apiKey;
 let layersAdded = new Map();
 let pointsAdded = new Set();
 let storiesAdded = new Set();
+let layersCrossedWithColor = new Set();
 let mapMarkers = [];
-
+const notSelectedColor =  '#808080'
+const selectedColor = "yellow"
 const baseMaps = {
   "Street" : "mapbox://styles/tejasarora5/clyrlvr9b000101ph8q1hgmsa",
   "Satellite" : "mapbox://styles/mapbox/satellite-streets-v12"
@@ -128,6 +130,11 @@ const MapComponenet = ({
   }
 
   function addLayerFromSourceId(id) {
+    let colorChosen  = notSelectedColor;
+    if (layersCrossedWithColor.has(id)) {
+      console.log("LAYER ID IS SELECTED: "  + id)
+      colorChosen = selectedColor;
+    }
     map.current.addLayer({
       id: id,
       slot: 'top',
@@ -137,16 +144,10 @@ const MapComponenet = ({
         "line-join": "round",
         "line-cap": "round",
       },
-      paint: {
-        "line-color": [
-          "case",
-          ["==", ["get", "id"], 1], // Replace 1 with the id of the feature you want to style
-          "#808080", // Initial color for the selected feature
-          "#808080"  // Color for other features
-        ],
-        "line-width": 6,
-        "line-opacity": 1,
-      },
+      'paint': {
+        'line-color': colorChosen,
+        'line-width': 6
+      }
     });
   }
 
@@ -258,6 +259,8 @@ const MapComponenet = ({
 
     pointsAdded.clear();
     mapMarkers.forEach((marker) => marker.remove());
+    layersCrossedWithColor.clear();
+
   }
 
   useEffect(()=>{
@@ -539,10 +542,16 @@ const MapComponenet = ({
     await animatePath(map.current,
                 path,
                 id,
-                "yellow",
-                "#808080",
+                selectedColor,
+                notSelectedColor,
                 direction
               );
+    if (direction == 'next') {
+      layersCrossedWithColor.add(id);
+    } else {
+      layersCrossedWithColor.delete(id);
+    }
+    
   }
 
   let overallBbox;

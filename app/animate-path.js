@@ -48,9 +48,9 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
         map.setPaintProperty(layerId, 'line-gradient', [
           'step',
           ['line-progress'],
-          'yellow',
+          colorProcessed,
           animationPhase,
-          '#808080'
+          colorRemaining
         ]);
 
        
