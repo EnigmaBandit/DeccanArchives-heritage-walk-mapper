@@ -34,7 +34,7 @@ function createCustomMarkerElement(pointId) {
   el.style.height = "15px";
   el.style.borderRadius = "50%";
   el.style.backgroundColor = "#FF8C00";
-  el.style.zIndex = "3"; // Set a high z-index
+  el.style.zIndex = "2"; // Set a high z-index
   el.addEventListener("click", (e) => {
     e.stopPropagation(); // Prevent the click from reaching the map
     console.log("clicked on marker", pointId);
@@ -218,24 +218,24 @@ const MapComponenet = ({
         .queryRenderedFeatures(e.point, { layers: [id] })
         .map((feature) => ({ ...feature, sourceId: id }))
     );
-
+  
     if (features.length > 0) {
       const storyIds = features.map((feature) => feature.sourceId);
-
+  
       const popupContent = `
-            <div>
-              ${storyIds
-                .map(
-                  (id) => `
-                <button onclick="window.handleStorySelect('${id.split(':')[0]}')">
-                  ${stories[id.split(':')[0]].name}
-                </button>
-              `
-                )
-                .join("")}
-            </div>
-          `;
-
+        <div>
+          ${storyIds
+            .map(
+              (id) => `
+            <button onclick="window.handleStorySelect('${id.split(':')[0]}')">
+              ${stories[id.split(':')[0]].name}
+            </button>
+          `
+            )
+            .join("")}
+        </div>
+      `;
+  
       popup.current
         .setLngLat(e.lngLat)
         .setHTML(popupContent)
@@ -272,7 +272,7 @@ const MapComponenet = ({
     );
   }, [overlaidMapOpacity])
 
-
+  
   useEffect(() => {
     window.handleStorySelect = (id) => {
       console.log("ClickEd on feature ID" + id);
@@ -281,6 +281,7 @@ const MapComponenet = ({
       }
       setSelectedFeature(["story", id]);
       setDisplayedContent(["story", id, -1]);
+      setFocusedFeature(["story", id]);
       popup.current.remove();
     };
 
