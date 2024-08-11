@@ -63,7 +63,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
       <nav className=" flex justify-between items-center p-4 bg-white shadow-md  z-10 rounded-lg mx-4 mt-4">
         <div className="flex items-center space-x-4">
           <Link href="/" className="text-gray-800 text-2xl font-semibold">
-            Stories of Hyderabad
+            Explore Hyderabad
           </Link>
           <span className="text-gray-500">By Deccan Archives</span>
         </div>

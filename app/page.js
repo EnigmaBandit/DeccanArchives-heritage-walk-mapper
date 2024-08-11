@@ -8,6 +8,10 @@ let themes ;
 let referencedMaps;
 let referencedMapsInput;
 
+export const metadata = {
+  title: 'Explore Hyderabad',
+}
+
 
 
 export default async  function Home() {
