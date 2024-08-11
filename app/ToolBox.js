@@ -11,9 +11,8 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
     useEffect(()=>{
       const handleClickOutside = (event) => {
         if (searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+          setSearchTerm('');
           if (selectedFeature.length == 0) {
-            console.log("refreshing search term to none")
-            setSearchTerm('');
             searchInputRef.current = false;
           }
           
@@ -33,6 +32,7 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
         setSearchTerm(event.target.value);
         let filtered = storyNamesList.filter(word => word[1].toLowerCase().includes(term));
         setFilteredWords(filtered);
+        setIsSearchSelected(true);
         
     };
     let handleSelect = (event) => {
@@ -84,22 +84,24 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
       </nav>
       <div>
         <div className="flex items-center mt-2">
-            <form className="  w-[450px] ml-5  bg-white shadow-md rounded-full" ref={searchInputRef}>
+            <form className="  w-[450px] ml-5  flex-shrink-0 bg-white shadow-md rounded-full" ref={searchInputRef}>
                   <input type="search" placeholder="Search Heritage Walks" className=" bg-transparent rounded-full pl-5 h-8 w-[95%] "
                     value={searchTerm}
                     onChange={handleSearch} 
                     onClick ={handleSelect}/>
             </form>
-            <div className=" flex-grow my-auto">
+            <div className=" flex-grow my-auto overflow-x-auto ">
+              <div className="flex flex-nowrap  ml-[10px] flex-shrink-0">
                 {Object.entries(themes).map(([key, value]) => (
                   <button 
                     key={key} 
-                    className="bg-white h-7 text-gray-500 shadow-md hover:bg-gray-200 pl-[15px] pr-[15px] ml-[10px] rounded-full"
+                    className="bg-white h-7 text-gray-500 shadow-md hover:bg-gray-200 pl-[15px] pr-[15px]  mr-[10px] rounded-full whitespace-nowrap"
                     onClick={() => selectTheme(key)} 
                   >
                     {value['name']}
                   </button>
                 ))}
+              </div>
             </div>
         </div>
         
