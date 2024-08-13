@@ -90,12 +90,23 @@ const Toolbox = ({selectedFeature, setSelectedFeature, setDisplayedContent, focu
                     onChange={handleSearch} 
                     onClick ={handleSelect}/>
             </form>
-            <div className=" flex-grow my-auto overflow-x-auto ">
-              <div className="flex flex-nowrap  ml-[10px] flex-shrink-0">
+            <div className="flex-grow my-auto overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div 
+                className="flex flex-nowrap ml-[10px] flex-shrink-0 cursor-grab active:cursor-grabbing"
+                style={{ 
+                  overflowX: 'auto',
+                  WebkitOverflowScrolling: 'touch'
+                }}
+              >
+                <style jsx>{`
+                  div::-webkit-scrollbar {
+                    display: none;
+                  }
+                `}</style>
                 {Object.entries(themes).map(([key, value]) => (
                   <button 
                     key={key} 
-                    className="bg-white h-7 text-gray-500 shadow-md hover:bg-gray-200 pl-[15px] pr-[15px]  mr-[10px] rounded-full whitespace-nowrap"
+                    className="bg-white h-7 text-gray-500 shadow-md hover:bg-gray-200 pl-[15px] pr-[15px] mr-[10px] rounded-full whitespace-nowrap"
                     onClick={() => selectTheme(key)} 
                   >
                     {value['name']}
