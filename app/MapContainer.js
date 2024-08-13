@@ -8,6 +8,7 @@ import ContentBar from "./ContentBar";
 import MapSourceControl from "./MapSourceControl";
 import { FaMap } from "react-icons/fa";
 import animatePath from  "./animate-path"
+import { toggleMapInteractions } from './PageInternal';
 const apiKey = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
 if (apiKey) {
@@ -539,6 +540,7 @@ const MapComponenet = ({
   async function animateAcrossStoryPath(id, path, direction) {
     console.log("Before caling path is:")
     console.log(path);
+    toggleMapInteractions(map, false);
     await animatePath(map.current,
                 path,
                 id,
@@ -551,6 +553,7 @@ const MapComponenet = ({
     } else {
       layersCrossedWithColor.delete(id);
     }
+    toggleMapInteractions(map, true);
     
   }
 

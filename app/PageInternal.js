@@ -3,16 +3,36 @@ import Toolbox from './ToolBox'
 import MapComponenet from './MapContainer'
 import React, { useEffect, useState } from 'react';
 
+let clickHandler;
 export let toggleMapInteractions = (map, enable) => {
-  const interactiveHandlers = ['dragPan', 'scrollZoom', 'boxZoom', 'dragRotate', 'keyboard', 'doubleClickZoom', 'touchZoomRotate'];
-  
-  interactiveHandlers.forEach(handler => {
-    if (enable) {
-      map[handler].enable();
+
+
+  if (!enable) {
+    console.log("adding lock");
+    clickHandler = (e) => {
+      console.log("Stopping")
+      e.stopPropagation();
+      e.preventDefault();
+    };
+    document.addEventListener("click", clickHandler, true);
+  } else {
+    if (clickHandler) {
+    console.log("removing lock");
+      document.removeEventListener("click", clickHandler, true);
     } else {
-      map[handler].disable();
+      console.log("unable in removing lock");
     }
-  });
+
+  }
+  // const interactiveHandlers = ['dragPan', 'scrollZoom', 'boxZoom', 'dragRotate', 'keyboard', 'doubleClickZoom', 'touchZoomRotate'];
+  
+  // interactiveHandlers.forEach(handler => {
+  //   if (enable) {
+  //     map[handler].enable();
+  //   } else {
+  //     map[handler].disable();
+  //   }
+  // });
 };
 
 

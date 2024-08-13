@@ -1,5 +1,4 @@
 import * as turf from "@turf/turf";
-import { toggleMapInteractions } from './PageInternal';
 
 let finished = false;
 const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, direction ) => {
@@ -19,6 +18,7 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
 
   
       const frame = async (currentTime) => {
+        
         if (finished == true) {
           finished = false;
           resolve();
@@ -27,8 +27,8 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
         if (!startTime) startTime = currentTime;
         let timeDiff = currentTime - startTime;
         let animationPhase = timeDiff/ duration;
+        //console.log("animation point is : "  +animationPhase );
         if (animationPhase > 1) {
-          toggleMapInteractions(map, true);
           finished  = true;
           animationPhase =1;
         }
