@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaMapMarkerAlt, FaLayerGroup, FaAdjust } from 'react-icons/fa';
 
 
-const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, overlaidMap, setOverlaidMap, setOverlaidMapOpacity, referencedMaps}) => {
+const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, overlaidMap, setOverlaidMap, setOverlaidMapOpacity, referencedMaps, closeOtherPopups}) => {
   const [selectedMap, setSelectedMap] = useState('');
   const [opacity, setOpacity] = useState(100);
   console.log("referencedMaps are : ");

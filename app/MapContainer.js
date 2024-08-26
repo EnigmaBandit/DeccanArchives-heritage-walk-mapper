@@ -6,13 +6,13 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import * as turf from "@turf/turf";
 import ContentBar from "./ContentBar";
 import MapSourceControl from "./MapSourceControl";
-import { FaMap } from "react-icons/fa";
-import animatePath from  "./animate-path"
-import { toggleMapInteractions } from './PageInternal';
+import { FaAccessibleIcon, FaMap } from "react-icons/fa";
+import animatePath from "./animate-path";
+import { toggleMapInteractions } from "./PageInternal";
 const apiKey = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
 if (apiKey) {
-   console.log ("key is present : " + apiKey);
+  console.log("key is present : " + apiKey);
 } else {
   console.log("no key");
 }
@@ -23,12 +23,12 @@ let pointsAdded = new Set();
 let storiesAdded = new Set();
 let layersCrossedWithColor = new Set();
 let mapMarkers = [];
-const notSelectedColor =  '#808080'
-const selectedColor = "yellow"
+const notSelectedColor = "#808080";
+const selectedColor = "yellow";
 const baseMaps = {
-  "Street" : "mapbox://styles/tejasarora5/clyrlvr9b000101ph8q1hgmsa",
-  "Satellite" : "mapbox://styles/mapbox/satellite-streets-v12"
-}
+  Street: "mapbox://styles/tejasarora5/clyrlvr9b000101ph8q1hgmsa",
+  Satellite: "mapbox://styles/mapbox/satellite-streets-v12",
+};
 
 function createCustomMarkerElement(pointId) {
   const el = document.createElement("div");
@@ -46,7 +46,6 @@ function createCustomMarkerElement(pointId) {
   return el;
 }
 
-
 const MapComponenet = ({
   selectedFeature,
   setSelectedFeature,
@@ -60,24 +59,31 @@ const MapComponenet = ({
   themeStoryList,
   referencedMaps,
   setSearchTerm,
+  showOptions,
+  setShowOptions,
+  showStoryPopup,
+  setShowStoryPopup,
+  showPointPopup,
+  setShowPointPopup,
+  closeOtherPopups,
 }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [lng, setLng] = useState(78.476);
   const [lat, setLat] = useState(17.366);
   const [zoom, setZoom] = useState(10);
-  const [showOptions, setShowOptions] = useState(false);
   const [baseMap, setBaseMap] = useState("Street");
-  const [overlaidMap, setOverlaidMap] = useState('None');
+  const [overlaidMap, setOverlaidMap] = useState("None");
   const [overlaidMapOpacity, setOverlaidMapOpacity] = useState();
   const [isoverloadDisplayed, setIsoverloadDisplayed] = useState(false);
   const isOverlayDisplayedRef = useRef(false);
-  const overlaidMapRef = useRef('');
-  let overlaidMapOpacityRef = useRef('');
+  const overlaidMapRef = useRef("");
+  let overlaidMapOpacityRef = useRef("");
 
   const popup = useRef(
-    new mapboxgl.Popup({ closeButton: true, closeOnClick: false })
+    new mapboxgl.Popup({ closeButton: false, closeOnClick: true })
   );
+  let pointPopupRef = useRef(null);
   function displayMarker(pointId) {
     if (pointsAdded.has(pointId)) {
       return;
@@ -104,24 +110,31 @@ const MapComponenet = ({
 
     // Add click event listener to the marker
     marker.getElement().addEventListener("click", () => {
+      if (pointPopupRef.current != null) {
+        pointPopupRef.current.remove();
+      }
+
+      closeOtherPopups("Point marker");
       marker.togglePopup(); // This will show the popup when the marker is clicked
+      pointPopupRef.current = markerPopup;
+      setShowPointPopup(true);
     });
   }
 
-  function handleMarkerClick(pointId) {
-    // Set the selected feature to this point
-    setDisplayedContent(["point", pointId]);
-  }
-  
+  useEffect(() => {
+    if (!showPointPopup && pointPopupRef.current != null) {
+      pointPopupRef.current.remove();
+      pointPopupRef.current = null;
+    }
+  }, [showPointPopup]);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     console.log("isoverloadDisplayed is changed: " + isoverloadDisplayed);
     isOverlayDisplayedRef.current = isoverloadDisplayed;
     overlaidMapRef.current = overlaidMap;
-  },[isoverloadDisplayed])
+  }, [isoverloadDisplayed]);
 
-  function addStoryObj (id, storyObj) {
+  function addStoryObj(id, storyObj) {
     map.current.addSource(id, {
       type: "geojson",
       data: storyObj,
@@ -131,24 +144,24 @@ const MapComponenet = ({
   }
 
   function addLayerFromSourceId(id) {
-    let colorChosen  = notSelectedColor;
+    let colorChosen = notSelectedColor;
     if (layersCrossedWithColor.has(id)) {
-      console.log("LAYER ID IS SELECTED: "  + id)
+      console.log("LAYER ID IS SELECTED: " + id);
       colorChosen = selectedColor;
     }
     map.current.addLayer({
       id: id,
-      slot: 'top',
+      slot: "top",
       type: "line",
       source: id,
       layout: {
         "line-join": "round",
         "line-cap": "round",
       },
-      'paint': {
-        'line-color': colorChosen,
-        'line-width': 6
-      }
+      paint: {
+        "line-color": colorChosen,
+        "line-width": 6,
+      },
     });
   }
 
@@ -163,34 +176,33 @@ const MapComponenet = ({
     var storyObj = JSON.parse(coordString);
     console.log("PARENT GEOJSON");
     console.log(storyObj);
-  let separatedGeoJSONs = [];
+    let separatedGeoJSONs = [];
 
-  for (let i = 0 ; i < storyObj.features.length ; i++) {
-    let newGeoJSON = {
-      crs: storyObj.crs,
-      type: 'FeatureCollection',
-      features: [  storyObj.features[i]]
-    };
-    console.log("ADDing geojson : " )
-    console.log(newGeoJSON);
-    let layerId = storyId + ":" + i;
-    layersAdded.set(layerId, newGeoJSON);
-    addStoryObj(layerId, newGeoJSON);
+    for (let i = 0; i < storyObj.features.length; i++) {
+      let newGeoJSON = {
+        crs: storyObj.crs,
+        type: "FeatureCollection",
+        features: [storyObj.features[i]],
+      };
+      console.log("ADDing geojson : ");
+      console.log(newGeoJSON);
+      let layerId = storyId + ":" + i;
+      layersAdded.set(layerId, newGeoJSON);
+      addStoryObj(layerId, newGeoJSON);
 
-    // Change the cursor to a pointer when hovering over the polyline layer
-    map.current.on("mouseenter", layerId, () => {
-      map.current.getCanvas().style.cursor = "pointer";
-    });
+      // Change the cursor to a pointer when hovering over the polyline layer
+      map.current.on("mouseenter", layerId, () => {
+        map.current.getCanvas().style.cursor = "pointer";
+      });
 
-    // Change it back when it leaves
-    map.current.on("mouseleave", layerId, () => {
-      map.current.getCanvas().style.cursor = "";
-    });
-    
-  }
+      // Change it back when it leaves
+      map.current.on("mouseleave", layerId, () => {
+        map.current.getCanvas().style.cursor = "";
+      });
+    }
 
-  console.log("adding points included");;
-  console.log(story["pointsIncluded"])
+    console.log("adding points included");
+    console.log(story["pointsIncluded"]);
     for (let i in story["pointsIncluded"]) {
       let pointId = story["pointsIncluded"][i].toString();
       displayMarker(pointId);
@@ -203,7 +215,10 @@ const MapComponenet = ({
       div.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
       div.style.cursor = "pointer";
       div.addEventListener("contextmenu", (e) => e.preventDefault());
-      div.addEventListener("click", () => setShowOptions(!showOptions));
+      div.addEventListener("click", () => {
+        setShowOptions(!showOptions);
+        closeOtherPopups("mapOptions");
+      });
       const root = ReactDOM.createRoot(div);
       root.render(<FaMap className="w-[29px] h-[29px] p-[7px]" />);
       return div;
@@ -214,41 +229,55 @@ const MapComponenet = ({
   }
 
   function handleMapClick(e) {
+    closeOtherPopups("all");
     setShowOptions(false);
     const features = Array.from(layersAdded.keys()).flatMap((id) =>
       map.current
         .queryRenderedFeatures(e.point, { layers: [id] })
         .map((feature) => ({ ...feature, sourceId: id }))
     );
-  
+
     if (features.length > 0) {
       const storyIds = features.map((feature) => feature.sourceId);
-  
+      closeOtherPopups("story marker");
       const popupContent = `
         <div>
           ${storyIds
             .map(
               (id) => `
-            <button onclick="window.handleStorySelect('${id.split(':')[0]}')">
-              ${stories[id.split(':')[0]].name}
+            <button onclick="window.handleStorySelect('${id.split(":")[0]}')">
+              ${stories[id.split(":")[0]].name}
             </button>
           `
             )
             .join("")}
         </div>
       `;
-  
+
       popup.current
         .setLngLat(e.lngLat)
         .setHTML(popupContent)
         .addTo(map.current);
+
+      setShowStoryPopup(true);
     } else {
       popup.current.remove();
     }
   }
 
+  useEffect(() => {
+    if (!showStoryPopup) {
+      popup.current.remove();
+    }
+  }, [showStoryPopup]);
+
+  useEffect(() => {
+    if (showStoryPopup == false) {
+      popup.current.remove();
+    }
+  }, [showStoryPopup]);
   function clearMap() {
-    for (let [key,val] of layersAdded) {
+    for (let [key, val] of layersAdded) {
       map.current.removeLayer(key);
       map.current.removeSource(key);
       layersAdded.delete(key);
@@ -261,32 +290,35 @@ const MapComponenet = ({
     pointsAdded.clear();
     mapMarkers.forEach((marker) => marker.remove());
     layersCrossedWithColor.clear();
-
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     overlaidMapOpacityRef.current = overlaidMapOpacity;
     if (!isOverlayDisplayedRef.current) {
       return;
     }
     map.current.setPaintProperty(
-      'overlaidMap',
-      'raster-opacity',
-      overlaidMapOpacityRef.current/100
+      "overlaidMap",
+      "raster-opacity",
+      overlaidMapOpacityRef.current / 100
     );
-  }, [overlaidMapOpacity])
+  }, [overlaidMapOpacity]);
 
-  
   useEffect(() => {
     window.handleStorySelect = (id) => {
       console.log("ClickEd on feature ID" + id);
-      if (displayedContent[0] == 'story' && displayedContent[1] == id && displayedContent[2] == -1) {
+      if (
+        displayedContent[0] == "story" &&
+        displayedContent[1] == id &&
+        displayedContent[2] == -1
+      ) {
         return;
       }
       setSelectedFeature(["story", id]);
       setDisplayedContent(["story", id, -1]);
       setFocusedFeature(["story", id]);
       popup.current.remove();
+      closeOtherPopups("all");
     };
 
     window.handlePointSelect = (id) => {
@@ -294,7 +326,11 @@ const MapComponenet = ({
       setDisplayedContent(["point", id]);
       setFocusedFeature(["point", id]);
       console.log(points[id]);
-      popup.current.remove();
+      if (pointPopupRef.current != null) {
+        pointPopupRef.current.remove();
+      }
+
+      closeOtherPopups("all");
     };
 
     return () => {
@@ -311,8 +347,6 @@ const MapComponenet = ({
       center: [lng, lat],
       zoom: zoom,
     });
-
-
 
     const mapSourceButton = new MapSourceButton(showOptions, setShowOptions);
 
@@ -343,8 +377,7 @@ const MapComponenet = ({
         ["==", ["get", "maritime"], "false"],
         ["match", ["get", "worldview"], ["all", "IN"], true, false],
       ]);
-  }
-  );
+    });
   });
 
   useEffect(() => {
@@ -358,46 +391,44 @@ const MapComponenet = ({
     }
   }, [selectedFeature]);
 
-
   useEffect(() => {
     if (isoverloadDisplayed == true) {
-    map.current.removeLayer('overlaidMap');
-    map.current.removeSource('overlaidMap');
+      map.current.removeLayer("overlaidMap");
+      map.current.removeSource("overlaidMap");
     }
-    if(overlaidMap ==='None') {
+    if (overlaidMap === "None") {
       setIsoverloadDisplayed(false);
       return;
     }
     let tileSetUrl = "mapbox://" + overlaidMap;
-      setIsoverloadDisplayed(true);
-      map.current.addSource('overlaidMap', {
-        type: 'raster',
-        url: tileSetUrl
-      });
+    setIsoverloadDisplayed(true);
+    map.current.addSource("overlaidMap", {
+      type: "raster",
+      url: tileSetUrl,
+    });
 
-      console.log("Adding with opacity: " + overlaidMapOpacity)
+    console.log("Adding with opacity: " + overlaidMapOpacity);
 
-      map.current.addLayer({
-        id: 'overlaidMap',
-        slot: 'top',
-        source: 'overlaidMap',
-        type: 'raster',
-        'paint': {
-          'raster-opacity': overlaidMapOpacity/100 // Set the opacity to 0.5
-        }
-      });
+    map.current.addLayer({
+      id: "overlaidMap",
+      slot: "top",
+      source: "overlaidMap",
+      type: "raster",
+      paint: {
+        "raster-opacity": overlaidMapOpacity / 100, // Set the opacity to 0.5
+      },
+    });
 
-      for (let [key,val] of layersAdded) {
-        map.current.removeLayer(key);
-        addLayerFromSourceId(key);
-      }
-  },[overlaidMap])
+    for (let [key, val] of layersAdded) {
+      map.current.removeLayer(key);
+      addLayerFromSourceId(key);
+    }
+  }, [overlaidMap]);
 
   useEffect(() => {
-
-    let startAnimation = async(storyId, pathCoord, direction) =>{
-      await animateAcrossStoryPath(storyId, pathCoord, direction)
-    }
+    let startAnimation = async (storyId, pathCoord, direction) => {
+      await animateAcrossStoryPath(storyId, pathCoord, direction);
+    };
     let featureType = focusedFeature[0];
     console.log("Selected FEature type " + featureType);
     console.log(focusedFeature);
@@ -445,11 +476,12 @@ const MapComponenet = ({
       console.log("DIRECTIO HERE IS : " + direction);
       let storyId = focusedFeature[2];
       let pathindex = focusedFeature[3];
-      let layerId = storyId + ':' + pathindex;
+      let layerId = storyId + ":" + pathindex;
       console.log("LAYER ID : " + layerId);
       let geoObj = layersAdded.get(layerId);
       console.log(geoObj);
-      let pathCoord = layersAdded.get(layerId)['features'][0]['geometry']['coordinates'][0];
+      let pathCoord =
+        layersAdded.get(layerId)["features"][0]["geometry"]["coordinates"][0];
       // if (direction === 'previous') {
       //   console.log("THIS IS PREVIOS");
       //   console.log("BEFORE REVERSE");
@@ -460,70 +492,71 @@ const MapComponenet = ({
       // } else {
       //   console.log("NEXT");
       // }
-      
+
       startAnimation(layerId, pathCoord, direction);
     }
   }, [focusedFeature]);
-
 
   function updateMarkerStyles() {
     // Loop through all points and update their styles
     pointsAdded.forEach((pointId) => {
       const markerElement = document.getElementById(`point:${pointId}`);
-  
+
       if (markerElement) {
-        const isSelected = focusedFeature[0] === 'point' && focusedFeature[1] === pointId;
-  
+        const isSelected =
+          focusedFeature[0] === "point" && focusedFeature[1] === pointId;
+
         // Apply the appropriate styles using Tailwind classes
-        markerElement.className = `custom-marker w-4 h-4 rounded-full z-10 ${isSelected ? "bg-blue-500" : "bg-orange-500"}`;
+        markerElement.className = `custom-marker w-4 h-4 rounded-full z-10 ${
+          isSelected ? "bg-blue-500" : "bg-orange-500"
+        }`;
       }
     });
   }
 
-  useEffect(()=> {
-    for (let [key,val] of layersAdded) {
+  useEffect(() => {
+    for (let [key, val] of layersAdded) {
       map.current.removeLayer(key);
       map.current.removeSource(key);
     }
     if (isOverlayDisplayedRef.current) {
       console.log("removing source of overloid");
-      map.current.removeLayer('overlaidMap');
+      map.current.removeLayer("overlaidMap");
       map.current.removeSource("overlaidMap");
     } else {
       console.log("NOT REMOVING source of overloid");
     }
 
     let mapTile = baseMaps[baseMap];
-    map.current.setStyle(mapTile);      
-       map.current.on("style.load",()=>{
+    map.current.setStyle(mapTile);
+    map.current.on("style.load", () => {
       if (isOverlayDisplayedRef.current) {
         console.log("is overload within that method");
         let tileSetUrl = "mapbox://" + overlaidMapRef.current;
-        console.log("titleseturl: "  + tileSetUrl)
-          map.current.addSource('overlaidMap', {
-            type: 'raster',
-            url: tileSetUrl
-          });
-        console.log("overlaidMapOpacityRef.current: " + overlaidMapOpacityRef.current)
-        map.current.addLayer({
-          id: 'overlaidMap',
-          slot: 'top',
-          source: 'overlaidMap',
-          type: 'raster',
-          'paint': {
-            'raster-opacity': overlaidMapOpacityRef.current/100 
-          }
+        console.log("titleseturl: " + tileSetUrl);
+        map.current.addSource("overlaidMap", {
+          type: "raster",
+          url: tileSetUrl,
         });
-
+        console.log(
+          "overlaidMapOpacityRef.current: " + overlaidMapOpacityRef.current
+        );
+        map.current.addLayer({
+          id: "overlaidMap",
+          slot: "top",
+          source: "overlaidMap",
+          type: "raster",
+          paint: {
+            "raster-opacity": overlaidMapOpacityRef.current / 100,
+          },
+        });
       }
 
-      for (let [key,val] of layersAdded) {
+      for (let [key, val] of layersAdded) {
         addStoryObj(key, val);
       }
-      })
-
-    
-  }, [baseMap])
+    });
+  }, [baseMap]);
 
   function processSelectedTheme(id) {
     console.log(themeStoryList);
@@ -538,23 +571,23 @@ const MapComponenet = ({
   }
 
   async function animateAcrossStoryPath(id, path, direction) {
-    console.log("Before caling path is:")
+    console.log("Before caling path is:");
     console.log(path);
     toggleMapInteractions(map, false);
-    await animatePath(map.current,
-                path,
-                id,
-                selectedColor,
-                notSelectedColor,
-                direction
-              );
-    if (direction == 'next') {
+    await animatePath(
+      map.current,
+      path,
+      id,
+      selectedColor,
+      notSelectedColor,
+      direction
+    );
+    if (direction == "next") {
       layersCrossedWithColor.add(id);
     } else {
       layersCrossedWithColor.delete(id);
     }
     toggleMapInteractions(map, true);
-    
   }
 
   let overallBbox;
@@ -565,12 +598,13 @@ const MapComponenet = ({
       <MapSourceControl
         showOptions={showOptions}
         setShowOptions={setShowOptions}
-        baseMap = {baseMap}
+        baseMap={baseMap}
         setBaseMap={setBaseMap}
         overlaidMap={overlaidMap}
         setOverlaidMap={setOverlaidMap}
         setOverlaidMapOpacity={setOverlaidMapOpacity}
         referencedMaps={referencedMaps}
+        closeOtherPopups={closeOtherPopups}
       />
       <ContentBar
         displayedContent={displayedContent}

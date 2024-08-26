@@ -162,7 +162,7 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
   if (!isOpen) return null;
 
   return (
-    <div className="h-[82%] w-[450px] ml-5 bg-white shadow-md z-[2] absolute top-[130px] left-0 rounded-xl overflow-hidden flex flex-col">
+    <div className="h-[calc(100vh-172px)] w-[450px] ml-5 bg-white shadow-md z-[2] absolute top-[130px] left-0 rounded-xl overflow-hidden flex flex-col">
       <div className="p-4 bg-gray-50">
         <div className="flex justify-between items-start">
           <div className="flex justify-center items-center w-[400px]" >
