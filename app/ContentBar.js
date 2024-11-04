@@ -176,7 +176,7 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
 
       <div className="flex-grow overflow-y-auto">
         <div className="w-full flex justify-center mt-4">
-          <img src={`/images/${image}`} alt={title} className="w-[90%]"></img>
+          <img src={`/interactive-route-mapper/images/${image}`} alt={title} className="w-[90%]"></img>
         </div>
         
         
