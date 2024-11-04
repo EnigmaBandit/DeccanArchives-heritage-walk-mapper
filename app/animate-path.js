@@ -53,7 +53,7 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
 
        // Get screen width
         let isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
-        let bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
+        let bottomPadding = Math.floor(window.innerHeight * 0.7); // 60% of screen height
         // Define padding based on screen size
         let mapPadding = isScreenLarge
           ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
