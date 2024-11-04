@@ -51,7 +51,7 @@ export default function About() {
                     <div>
                         <h2 className="text-lg uppercase tracking-wider mb-6 text-gray-400">About me</h2>
                         <p className="font-light leading-loose">
-                            I'm Tejas Arora, a software developer with an interest in mapping and geospatial annalysis. Feel free to connect with me through any of the channels below.
+                            I&apos;m Tejas Arora, a software developer with an interest in mapping and geospatial annalysis. Feel free to connect with me through any of the channels below.
                         </p>
                         <div className="flex justify-between">
                             <a

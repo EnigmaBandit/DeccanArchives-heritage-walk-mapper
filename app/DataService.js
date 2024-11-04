@@ -2,11 +2,6 @@ async function fetchWords() {
     const ms = Date.now();
     const response = await fetch('https://script.google.com/macros/s/AKfycbxHBuH87RN3j557Hjxh34XRPSxuueCag1k1gBfAxVlb1TwYJggrrgJJ_-qr8bEDcYzojA/exec' +"?dummy="+ms);
     const jsonObject = await response.json();
-        //Add stories to themes
-    console.log("ABCS")
-    for ([key,val] in jsonObject['storeis']) { 
-      console.log("TEST + " + key);
-    }
     return jsonObject;
   }
   
