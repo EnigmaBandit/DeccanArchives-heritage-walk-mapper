@@ -76,7 +76,7 @@ export default function About() {
                             </a>
 
                             <a
-                                href="./TejasArora2024CV.pdf"
+                                href="./TejasAroraCV.pdf"
                                 className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
                             >
                                 <PiReadCvLogo size={20} />
