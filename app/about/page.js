@@ -29,10 +29,7 @@ export default function About() {
                     <div className="space-y-6">
                         <h2 className="text-lg uppercase tracking-wider mb-6 text-gray-400">Interactive Features</h2>
                         <p className="font-light leading-loose">
-                            The project maps walking routes using a three-levleed system: Themes, Individual Walks, and Points of Interest. Navigate through these layers using the interactive features integrated throughout the website.
-                        </p>
-                        <p className="font-light leading-loose">
-                        Use the map controls at the bottom right to explore more map styles and overlays.
+                        Use the map controls in the bottom right corner to switch between street and satellite views. You can also overlay a reference map with an adjustable slider to control its opacity.
                         </p>
                     </div>
 
@@ -79,7 +76,7 @@ export default function About() {
                             </a>
 
                             <a
-                                href="/tejas-arora-cv.pdf"
+                                href="interactive-route-mapper/TejasArora2024CV.pdf"
                                 className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
                             >
                                 <PiReadCvLogo size={20} />

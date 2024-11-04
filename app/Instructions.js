@@ -63,7 +63,7 @@ const Instructions = ({ themeId, themes, stories}) => {
                     <div>
                         <h3 className="font-semibold text-gray-900 mb-1">Map Controls</h3>
                         <p className="text-gray-800 leading-relaxed">
-                            Use the map controls at the bottom right to explore more map styles and overlays.
+                        Use the map controls in the bottom right corner to switch between street and satellite views. You can also overlay a reference map with an adjustable slider to control its opacity.
                         </p>
                     </div>
                 </div>
