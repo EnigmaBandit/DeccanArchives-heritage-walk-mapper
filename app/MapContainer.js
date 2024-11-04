@@ -13,12 +13,6 @@ const apiKey = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
 mapboxgl.accessToken = apiKey;
 // Get screen width
-const isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
-const bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
-// Define padding based on screen size
-const mapPadding = isScreenLarge
-  ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
-  : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen padding
 
 let layersAdded = new Map();
 let pointsAdded = new Set();
@@ -417,6 +411,13 @@ const MapComponenet = ({
       let story = stories[id];
       let jsonObj = JSON.parse(story["coord"]);
       let overallBbox = turf.bbox(jsonObj);
+      // Get screen width
+let isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
+let bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
+// Define padding based on screen size
+let mapPadding = isScreenLarge
+  ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
+  : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen paddin
       map.current.fitBounds(overallBbox, {
         padding: mapPadding,
       });
@@ -439,15 +440,27 @@ const MapComponenet = ({
         }
       }
       map.current.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
+      // Get screen width
+let isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
+let bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
+// Define padding based on screen size
+let mapPadding = isScreenLarge
+  ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
+  : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen paddin
       map.current.fitBounds(overallBbox, {
         padding: mapPadding,
       });
     } else if (featureType === "point") {
       updateMarkerStyles();
-      console.log("padding added:");
-      console.log(mapPadding);
       let point = points[id];
       let coord = JSON.parse(point["coord"]);
+      // Get screen width
+let isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
+let bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
+// Define padding based on screen size
+let mapPadding = isScreenLarge
+  ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
+  : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen paddin
       map.current.easeTo({
         center: coord,
         padding: mapPadding,

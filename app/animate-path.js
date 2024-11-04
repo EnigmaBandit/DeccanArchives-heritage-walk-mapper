@@ -1,13 +1,8 @@
+"use client"
+import React, { useState, useEffect, useRef } from 'react';
 import * as turf from "@turf/turf";
 
 let finished = false;
-// Get screen width
-const isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
-const bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
-// Define padding based on screen size
-const mapPadding = isScreenLarge
-  ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
-  : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen padding
 const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, direction ) => {
     return new Promise(async (resolve) => {
 
@@ -56,8 +51,16 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
           colorRemaining
         ]);
 
-       
+       // Get screen width
+        let isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
+        let bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
+        // Define padding based on screen size
+        let mapPadding = isScreenLarge
+          ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
+          : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen padding
+
         // Move the camera to the current position on the path
+        
         map.easeTo({
           center: lngLat,
           duration: 0,
