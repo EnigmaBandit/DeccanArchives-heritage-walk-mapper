@@ -26,7 +26,7 @@ const Instructions = ({ themeId, themes, stories}) => {
                         <div> 
                             <h3 className="font-semibold text-gray-900 mb-1">Follow Along</h3>
                             <p className="text-gray-800 leading-relaxed">
-                                You're currently viewing the theme description. To explore individual walks, either type a walk's name into the search bar or click directly on any walk on the map.
+                                You&apos;re currently viewing the theme description. To explore individual walks, either type a walk's name into the search bar or click directly on any walk on the map.
                             </p>
                             <div className="mt-4 pt-4 ">
                                 <div className='flex flex-shrink-0'>
