@@ -71,50 +71,16 @@ const Toolbox = ({
 
   return (
     <div className="toolboxOuter flex-col">
-      <nav className=" flex justify-between items-center p-4 bg-white shadow-md  z-10 rounded-lg mx-4 mt-4">
-        <div className="flex items-center space-x-4">
-          <Link href="/" className="text-gray-800 text-2xl font-semibold">
-            Explore Hyderabad
-          </Link>
-          <span className="text-gray-500">By Deccan Archives</span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Link
-            href="#"
-            className="text-gray-800 hover:text-gray-600 px-3 py-1 rounded-md"
-          >
-            Heritage Walks
-          </Link>
-          <Link
-            href="#"
-            className="text-gray-800 hover:text-gray-600 px-3 py-1 rounded-md"
-          >
-            Stories
-          </Link>
-          <Link
-            href="#"
-            className="text-gray-800 hover:text-gray-600 px-3 py-1 rounded-md"
-          >
-            Sources
-          </Link>
-          <Link
-            href="#"
-            className="text-gray-800 hover:text-gray-600 px-3 py-1 rounded-md"
-          >
-            About
-          </Link>
-        </div>
-      </nav>
       <div>
-        <div className="flex items-center mt-2">
+        <div className="flex  mt-[85px]   flex-col md:flex-row">
           <form
-            className="  w-[450px] ml-5  flex-shrink-0 bg-white shadow-md rounded-full"
+            className="mr-4 ml-4 md:mr-0 md:w-[450px] bg-white shadow-md rounded-full"
             ref={searchInputRef}
           >
             <input
               type="search"
-              placeholder="Search Heritage Walks"
-              className=" bg-transparent rounded-full pl-5 h-8 w-[95%] "
+              placeholder="Search"
+              className=" bg-transparent rounded-full h-8 w-[95%] pl-4"
               value={searchTerm}
               onChange={handleSearch}
               onClick={handleSelect}
@@ -125,7 +91,7 @@ const Toolbox = ({
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             <div
-              className="flex flex-nowrap ml-[10px] flex-shrink-0 cursor-grab active:cursor-grabbing"
+              className="flex flex-nowrap ml-4  mt-2 md:mt-0 shadow-md cursor-grab active:cursor-grabbing"
               style={{
                 overflowX: "auto",
                 WebkitOverflowScrolling: "touch",
@@ -139,7 +105,7 @@ const Toolbox = ({
               {Object.entries(themes).map(([key, value]) => (
                 <button
                   key={key}
-                  className="bg-white h-7 text-gray-500 shadow-md hover:bg-gray-200 pl-[15px] pr-[15px] mr-[10px] rounded-full whitespace-nowrap"
+                  className="bg-white h-7  text-gray-500 shadow-md hover:bg-gray-200 pl-[15px] pr-[15px] mr-[10px] rounded-full "
                   onClick={() => selectTheme(key)}
                 >
                   {value["name"]}
@@ -150,7 +116,7 @@ const Toolbox = ({
         </div>
 
         {isSearchSelected && (
-          <div className=" bg-white rounded-xl w-[450px] ml-5 mt-1 flex flex-col z-[3]  ">
+          <div className="absolute left-0 w-[calc(100vw-32px)] mx-4 md:w-[450px] md:relative  bg-white rounded-xl mt-1 flex flex-col z-[5] top-[120px] md:top-0">
             {filteredWords.map((singleDict, index) => (
               <span
                 key={index}

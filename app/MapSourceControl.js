@@ -5,8 +5,6 @@ import { FaMapMarkerAlt, FaLayerGroup, FaAdjust } from 'react-icons/fa';
 const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, overlaidMap, setOverlaidMap, setOverlaidMapOpacity, referencedMaps, closeOtherPopups}) => {
   const [selectedMap, setSelectedMap] = useState('');
   const [opacity, setOpacity] = useState(100);
-  console.log("referencedMaps are : ");
-  console.log(referencedMaps);
 
   useEffect(() => {
       setOpacity(100);
@@ -49,7 +47,7 @@ const MapSourceControl = ({ showOptions, setShowOptions, baseMap, setBaseMap, ov
       
       <div className="mb-6">
         <h3 className="font-semibold mb-2 flex items-center">
-          <FaLayerGroup className="mr-2" /> Historical Map Overlay
+          <FaLayerGroup className="mr-2" /> Reference Maps
         </h3>
         <select
           className="w-full p-2 bg-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"

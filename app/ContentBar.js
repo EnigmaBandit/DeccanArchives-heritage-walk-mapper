@@ -1,11 +1,13 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image'
 import { IoCloseOutline, IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
+import Instructions from "./Instructions";
 
 
 const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setFocusedFeature, stories, points, themes, selectedFeature, setSelectedFeature, setSearchTerm}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [titleFontSize, setTitleFontSize] = useState(30);
+  const [titleFontSize, setTitleFontSize] = useState(25);
   const titleRef = useRef(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -27,9 +29,6 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
 
   useEffect ( ()=> {
     clearContent();
-    console.log("displaing content");
-    console.log(displayedContent);
-
     if (displayedContent.length === 0) {
       return;
     }
@@ -37,35 +36,26 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
 
     setIsOpen(true);
     let id = displayedContent[1];
-    console.log("id : "+ id);
     if (displayedContent[0]=='story') {
-      console.log("GOING INSIDE STORY");
       let page = displayedContent[2] + 2;
       setCurrentPage(page);
       settotalPages( stories[id]['pointsIncluded'].length + 1);
       if (page == 1) {
-        console.log("plain story");
         setObjType('story');
         selectedObj = stories[id];
       } else {
         setObjType('point');
         let pointId = stories[id]['pointsIncluded'][displayedContent[2]];
         selectedObj = points[pointId];
-        console.log("story point");
       }
-      console.log("Setting story");
       
       
     } else if (displayedContent[0]==='theme') {
-      console.log("Setting theme");
       setObjType('theme');
       selectedObj = themes[id];
     } else if (displayedContent[0]==='point') {
-      console.log("Setting point");
       setObjType('point');
       selectedObj = points[id];
-    } else {
-      console.log("not allowed");
     }
     setTitle(selectedObj['name']);
     setImage(selectedObj['image']);
@@ -134,7 +124,6 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
 
   const handlePrevious = () => {
     setCurrentPage(currentPage - 1);
-    console.log("current page is : " + currentPage);
     let storyId = selectedFeature[1];
     setDisplayedContent(['story', storyId, displayedContent[2] - 1]);
     let pointIndex =  displayedContent[2] - 1;
@@ -162,13 +151,13 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
   if (!isOpen) return null;
 
   return (
-    <div className="h-[calc(100vh-172px)] w-[450px] ml-5 bg-white shadow-md z-[2] absolute top-[130px] left-0 rounded-xl overflow-hidden flex flex-col">
-      <div className="p-4 bg-gray-50">
+    <div className=" absolute bottom-8 h-[50vh] w-[calc(100vw-62px)] ml-4 mr-4 rounded-3xl md:h-[calc(100vh-172px)] md:w-[450px] bg-white shadow-md z-[2] md:top-[130px]  md:rounded-xl overflow-hidden flex flex-col">
+      <div className="p-1 bg-gray-100">
         <div className="flex justify-between items-start">
-          <div className="flex justify-center items-center w-[400px]" >
+          <div className="flex justify-center items-center w-full" >
             <h2 
               ref={titleRef}
-              className="font-bold leading-tight mb-2 mt-2 overflow-hidden"
+              className="font-bold  px-[80px] mb-1 mt-1 overflow-hidden text-center"
               style={{ 
                 fontSize: `${titleFontSize}px`,
                 display: '-webkit-box',
@@ -187,7 +176,7 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
 
       <div className="flex-grow overflow-y-auto">
         <div className="w-full flex justify-center mt-4">
-          <img src={image} alt={title} className="w-[90%]"></img>
+          <img src={`/images/${image}`} alt={title} className="w-[90%]"></img>
         </div>
         
         
@@ -204,9 +193,15 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
           }
           
         </div>
+
+        <Instructions
+          themeId={(displayedContent[0] == 'theme') ? displayedContent[1] : -1}
+          themes={themes}
+          stories={stories}/>
       </div>
 
-      <div className="p-4 bg-gray-50 flex justify-between items-center">
+    { ((displayedContent[0] == 'story')) &&     
+      <div className="p-4 bg-gray-100 flex justify-between items-center">
         <button 
           onClick={handlePrevious} 
           className={`text-gray-500 hover:text-gray-700 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -231,7 +226,7 @@ const ContentBar = ({displayedContent, setDisplayedContent, focusedFeature, setF
         >
           <IoChevronForwardOutline size={24} />
         </button>
-      </div>
+      </div>}
     </div>
   );
 };

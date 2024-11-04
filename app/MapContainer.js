@@ -11,22 +11,24 @@ import animatePath from "./animate-path";
 import { toggleMapInteractions } from "./PageInternal";
 const apiKey = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
-if (apiKey) {
-  console.log("key is present : " + apiKey);
-} else {
-  console.log("no key");
-}
 mapboxgl.accessToken = apiKey;
+// Get screen width
+const isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
+const bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
+// Define padding based on screen size
+const mapPadding = isScreenLarge
+  ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
+  : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen padding
 
 let layersAdded = new Map();
 let pointsAdded = new Set();
 let storiesAdded = new Set();
 let layersCrossedWithColor = new Set();
 let mapMarkers = [];
-const notSelectedColor = "#808080";
-const selectedColor = "yellow";
+let notSelectedColor = "#808080";
+let selectedColor = "yellow";
 const baseMaps = {
-  Street: "mapbox://styles/tejasarora5/clyrlvr9b000101ph8q1hgmsa",
+  Street: "mapbox://styles/tejasarora5/cm2u3dpyf00gc01pi64d38er0",
   Satellite: "mapbox://styles/mapbox/satellite-streets-v12",
 };
 
@@ -40,7 +42,6 @@ function createCustomMarkerElement(pointId) {
   el.style.zIndex = "2"; // Set a high z-index
   el.addEventListener("click", (e) => {
     e.stopPropagation(); // Prevent the click from reaching the map
-    console.log("clicked on marker", pointId);
     // Add your popup logic here
   });
   return el;
@@ -105,6 +106,8 @@ const MapComponenet = ({
       .setLngLat(JSON.parse(point["coord"]))
       .addTo(map.current);
 
+      marker.getElement().style.zIndex = 1;
+
     mapMarkers.push(marker);
     //marker.getElement().addEventListener('click', ()=> displayPointDescription(pointId));
 
@@ -129,13 +132,13 @@ const MapComponenet = ({
   }, [showPointPopup]);
 
   useEffect(() => {
-    console.log("isoverloadDisplayed is changed: " + isoverloadDisplayed);
     isOverlayDisplayedRef.current = isoverloadDisplayed;
     overlaidMapRef.current = overlaidMap;
   }, [isoverloadDisplayed]);
 
   function addStoryObj(id, storyObj) {
     map.current.addSource(id, {
+      tolerance: 0,
       type: "geojson",
       data: storyObj,
       lineMetrics: true,
@@ -146,7 +149,6 @@ const MapComponenet = ({
   function addLayerFromSourceId(id) {
     let colorChosen = notSelectedColor;
     if (layersCrossedWithColor.has(id)) {
-      console.log("LAYER ID IS SELECTED: " + id);
       colorChosen = selectedColor;
     }
     map.current.addLayer({
@@ -163,10 +165,21 @@ const MapComponenet = ({
         "line-width": 6,
       },
     });
+
+    map.current.setPaintProperty(id, 'line-width', [
+      'interpolate',
+      // Set the exponential rate of change to 0.5
+      ['exponential', 0.5],
+      ['zoom'],
+      7,10,
+      10,6
+    ]);
+
   }
 
-  function displayStory(storyId) {
-    console.log("in displaystory");
+
+
+  function displayStory(storyId, showPoints) {
     if (storiesAdded.has(storyId)) {
       return;
     }
@@ -174,8 +187,6 @@ const MapComponenet = ({
     var story = stories[storyId];
     var coordString = story["coord"];
     var storyObj = JSON.parse(coordString);
-    console.log("PARENT GEOJSON");
-    console.log(storyObj);
     let separatedGeoJSONs = [];
 
     for (let i = 0; i < storyObj.features.length; i++) {
@@ -184,8 +195,6 @@ const MapComponenet = ({
         type: "FeatureCollection",
         features: [storyObj.features[i]],
       };
-      console.log("ADDing geojson : ");
-      console.log(newGeoJSON);
       let layerId = storyId + ":" + i;
       layersAdded.set(layerId, newGeoJSON);
       addStoryObj(layerId, newGeoJSON);
@@ -201,8 +210,10 @@ const MapComponenet = ({
       });
     }
 
-    console.log("adding points included");
-    console.log(story["pointsIncluded"]);
+    if (!showPoints) {
+      return
+    }
+
     for (let i in story["pointsIncluded"]) {
       let pointId = story["pointsIncluded"][i].toString();
       displayMarker(pointId);
@@ -238,19 +249,13 @@ const MapComponenet = ({
     );
 
     if (features.length > 0) {
-      const storyIds = features.map((feature) => feature.sourceId);
+      const storyId =  features[0].sourceId;
       closeOtherPopups("story marker");
       const popupContent = `
-        <div>
-          ${storyIds
-            .map(
-              (id) => `
-            <button onclick="window.handleStorySelect('${id.split(":")[0]}')">
-              ${stories[id.split(":")[0]].name}
+        <div className="z-10">
+          <button onclick="window.handleStorySelect('${storyId.split(":")[0]}') " className="z-100 absolute">
+              ${stories[storyId.split(":")[0]].name}
             </button>
-          `
-            )
-            .join("")}
         </div>
       `;
 
@@ -306,7 +311,6 @@ const MapComponenet = ({
 
   useEffect(() => {
     window.handleStorySelect = (id) => {
-      console.log("ClickEd on feature ID" + id);
       if (
         displayedContent[0] == "story" &&
         displayedContent[1] == id &&
@@ -322,10 +326,8 @@ const MapComponenet = ({
     };
 
     window.handlePointSelect = (id) => {
-      console.log("within point select");
       setDisplayedContent(["point", id]);
       setFocusedFeature(["point", id]);
-      console.log(points[id]);
       if (pointPopupRef.current != null) {
         pointPopupRef.current.remove();
       }
@@ -343,7 +345,7 @@ const MapComponenet = ({
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/tejasarora5/clyrlvr9b000101ph8q1hgmsa",
+      style: "mapbox://styles/tejasarora5/cm2u3dpyf00gc01pi64d38er0",
       center: [lng, lat],
       zoom: zoom,
     });
@@ -356,28 +358,9 @@ const MapComponenet = ({
 
     map.current.on("click", handleMapClick);
 
-    map.current.on("load", () => {
-      map.current.setFilter("admin-0-boundary-disputed", [
-        "all",
-        ["==", ["get", "disputed"], "true"],
-        ["==", ["get", "admin_level"], 0],
-        ["==", ["get", "maritime"], "false"],
-        ["match", ["get", "worldview"], ["all", "IN"], true, false],
-      ]);
-      map.current.setFilter("admin-0-boundary", [
-        "all",
-        ["==", ["get", "admin_level"], 0],
-        ["==", ["get", "disputed"], "false"],
-        ["==", ["get", "maritime"], "false"],
-        ["match", ["get", "worldview"], ["all", "IN"], true, false],
-      ]);
-      map.current.setFilter("admin-0-boundary-bg", [
-        "all",
-        ["==", ["get", "admin_level"], 0],
-        ["==", ["get", "maritime"], "false"],
-        ["match", ["get", "worldview"], ["all", "IN"], true, false],
-      ]);
-    });
+    map.current.on('zoom', () => {
+      const currentZoom = map.current.getZoom();
+  });
   });
 
   useEffect(() => {
@@ -407,8 +390,6 @@ const MapComponenet = ({
       url: tileSetUrl,
     });
 
-    console.log("Adding with opacity: " + overlaidMapOpacity);
-
     map.current.addLayer({
       id: "overlaidMap",
       slot: "top",
@@ -430,8 +411,6 @@ const MapComponenet = ({
       await animateAcrossStoryPath(storyId, pathCoord, direction);
     };
     let featureType = focusedFeature[0];
-    console.log("Selected FEature type " + featureType);
-    console.log(focusedFeature);
     let id = focusedFeature[1];
     map.current.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
     if (featureType === "story") {
@@ -439,7 +418,7 @@ const MapComponenet = ({
       let jsonObj = JSON.parse(story["coord"]);
       let overallBbox = turf.bbox(jsonObj);
       map.current.fitBounds(overallBbox, {
-        padding: { top: 100, bottom: 100, left: 600, right: 100 },
+        padding: mapPadding,
       });
     } else if (featureType === "theme") {
       let overallBbox;
@@ -461,25 +440,24 @@ const MapComponenet = ({
       }
       map.current.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
       map.current.fitBounds(overallBbox, {
-        padding: { top: 100, bottom: 100, left: 600, right: 100 },
+        padding: mapPadding,
       });
     } else if (featureType === "point") {
       updateMarkerStyles();
+      console.log("padding added:");
+      console.log(mapPadding);
       let point = points[id];
       let coord = JSON.parse(point["coord"]);
       map.current.easeTo({
         center: coord,
-        padding: { left: 600, top: 100, right: 100, bottom: 100 },
+        padding: mapPadding,
       });
     } else if (featureType === "pathWithinStory") {
       let direction = focusedFeature[1];
-      console.log("DIRECTIO HERE IS : " + direction);
       let storyId = focusedFeature[2];
       let pathindex = focusedFeature[3];
       let layerId = storyId + ":" + pathindex;
-      console.log("LAYER ID : " + layerId);
       let geoObj = layersAdded.get(layerId);
-      console.log(geoObj);
       let pathCoord =
         layersAdded.get(layerId)["features"][0]["geometry"]["coordinates"][0];
       // if (direction === 'previous') {
@@ -520,27 +498,18 @@ const MapComponenet = ({
       map.current.removeSource(key);
     }
     if (isOverlayDisplayedRef.current) {
-      console.log("removing source of overloid");
       map.current.removeLayer("overlaidMap");
       map.current.removeSource("overlaidMap");
-    } else {
-      console.log("NOT REMOVING source of overloid");
     }
-
     let mapTile = baseMaps[baseMap];
     map.current.setStyle(mapTile);
     map.current.on("style.load", () => {
       if (isOverlayDisplayedRef.current) {
-        console.log("is overload within that method");
         let tileSetUrl = "mapbox://" + overlaidMapRef.current;
-        console.log("titleseturl: " + tileSetUrl);
         map.current.addSource("overlaidMap", {
           type: "raster",
           url: tileSetUrl,
         });
-        console.log(
-          "overlaidMapOpacityRef.current: " + overlaidMapOpacityRef.current
-        );
         map.current.addLayer({
           id: "overlaidMap",
           slot: "top",
@@ -559,20 +528,17 @@ const MapComponenet = ({
   }, [baseMap]);
 
   function processSelectedTheme(id) {
-    console.log(themeStoryList);
     for (let index = 0; index < themeStoryList[id].length; index++) {
       let storyId = themeStoryList[id][index];
-      displayStory(storyId);
+      displayStory(storyId, false);
     }
   }
 
   function processSelectedStory(id) {
-    displayStory(id);
+    displayStory(id, true);
   }
 
   async function animateAcrossStoryPath(id, path, direction) {
-    console.log("Before caling path is:");
-    console.log(path);
     toggleMapInteractions(map, false);
     await animatePath(
       map.current,
@@ -591,6 +557,12 @@ const MapComponenet = ({
   }
 
   let overallBbox;
+    useEffect(() => {   
+      return () => {
+        // This runs when component unmounts
+        clearMap();
+      };
+    }, []);
 
   return (
     <div>

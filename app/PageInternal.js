@@ -6,19 +6,14 @@ import React, { useEffect, useState } from "react";
 let clickHandler;
 export let toggleMapInteractions = (map, enable) => {
   if (!enable) {
-    console.log("adding lock");
     clickHandler = (e) => {
-      console.log("Stopping");
       e.stopPropagation();
       e.preventDefault();
     };
     document.addEventListener("click", clickHandler, true);
   } else {
     if (clickHandler) {
-      console.log("removing lock");
       document.removeEventListener("click", clickHandler, true);
-    } else {
-      console.log("unable in removing lock");
     }
   }
   // const interactiveHandlers = ['dragPan', 'scrollZoom', 'boxZoom', 'dragRotate', 'keyboard', 'doubleClickZoom', 'touchZoomRotate'];
@@ -68,7 +63,6 @@ const PageInternal = ({
       setIsSearchSelected(false);
       setSearchTerm("");
     }
-    console.log("close all other than  " + currentOne);
   };
 
   return (

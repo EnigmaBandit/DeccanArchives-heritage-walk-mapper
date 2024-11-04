@@ -1,19 +1,25 @@
 import * as turf from "@turf/turf";
 
 let finished = false;
+// Get screen width
+const isScreenLarge = window.innerWidth > 768; // Adjust this value for "medium" screen
+const bottomPadding = Math.floor(window.innerHeight * 0.6); // 60% of screen height
+// Define padding based on screen size
+const mapPadding = isScreenLarge
+  ? { left: 600, top: 150, right: 100, bottom: 100 } // Large screen padding
+  : { left: 100, top: 200, right: 100, bottom: bottomPadding }; // Small screen padding
 const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, direction ) => {
     return new Promise(async (resolve) => {
 
       let lineStringObj = turf.lineString(path);
       const pathDistance = turf.length(lineStringObj);
-      //1 seconds for 300 meters in milli seconds
+      //300 ms min, 1.5 sec max
       let duration =(pathDistance/0.5) * 1000;
       if (duration < 300) {
         duration = 300
-      } else if (duration > 1000) {
-        duration = 1000
+      } else if (duration > 1500) {
+        duration = 1500
       }
-      console.log("DURATION : " + duration);
       let startTime;
 
   
@@ -27,14 +33,12 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
         if (!startTime) startTime = currentTime;
         let timeDiff = currentTime - startTime;
         let animationPhase = timeDiff/ duration;
-        //console.log("animation point is : "  +animationPhase );
         if (animationPhase > 1) {
           finished  = true;
           animationPhase =1;
         }
         if (direction == "previous") {
           animationPhase = 1- animationPhase;
-          console.log(animatePath);
         } 
   
         const alongPath = turf.along(lineStringObj, pathDistance * animationPhase).geometry.coordinates;
@@ -43,7 +47,6 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
           lng: alongPath[0],
           lat: alongPath[1],
         };
-        console.log(animationPhase)
         
         map.setPaintProperty(layerId, 'line-gradient', [
           'step',
@@ -58,7 +61,8 @@ const animatePath = async ( map, path, layerId, colorProcessed, colorRemaining, 
         map.easeTo({
           center: lngLat,
           duration: 0,
-          animate: false
+          animate: false,
+          padding: mapPadding,
         });
   
         await window.requestAnimationFrame(frame);

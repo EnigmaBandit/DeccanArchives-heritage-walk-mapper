@@ -9,7 +9,8 @@ let referencedMaps;
 let referencedMapsInput;
 
 export const metadata = {
-  title: 'Explore Hyderabad',
+  title: 'Explore With Me',
+  icon: 'MapIcon.svg'
 }
 
 
@@ -37,9 +38,6 @@ export default async  function Home() {
         themeStoryList[themeId].push(key);
       }
     }
-
-    console.log(themeStoryList);
-
 
   return (
     <>
